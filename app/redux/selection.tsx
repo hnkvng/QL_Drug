@@ -1,17 +1,13 @@
 import { rootReducer } from "./store";
 
 //Modal
-    const getDataPicker = (state : rootReducer) => state.Modal.datePicker;
     const getNotifi = (state : rootReducer) => state.Modal.notifi;
     const getLoading = (state : rootReducer) => state.Modal.loading;
     const getSelection = (state : rootReducer) => state.Modal.selection;
-    const getFactSelection = (state : rootReducer) => state.Modal.factSelection;
     export {
-        getDataPicker,
         getNotifi,
         getLoading,
         getSelection,
-        getFactSelection
     }
 //
 
@@ -53,10 +49,8 @@ import { rootReducer } from "./store";
 
 
 //ScanScreen
-    const getCode = (state: rootReducer) => state.Scan.code;
-    const getController = (state: rootReducer) => state.Scan.controller;
+    const getScanController = (state: rootReducer) => state.Scan.controller;
     export {
-        getCode,
-        getController
+        getScanController
     }
 //

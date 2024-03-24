@@ -79,7 +79,9 @@ android {
         applicationId "com.ql_drug"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
+        missingDimensionStrategy 'react-native-camera', 'general'
         versionCode 1
+        minSdkVersion 23
         versionName "1.0"
     }
     signingConfigs {

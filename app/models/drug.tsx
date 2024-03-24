@@ -1,8 +1,8 @@
 import Realm from 'realm';
-import { Price as typePrice } from '../src/AddDrugScreen/addSlice';
-import { Inform } from '../modal/Notifi/notifiSlice';
-import { Items } from '../src/MainScreen/DrugPage/Component/ListDrug/listDrugSlice';
-import { ItemsDeleted } from '../src/TrushDrugScreen/component/ListDrugDeleted/listDrugDeletedSlice';
+import { Product, Price as typePrice } from '../src/screen/AddDrugScreen/addSlice';
+import { Inform } from '../src/Component/Notifi/notifiSlice';
+import { Items } from '../src/screen/MainScreen/DrugPage/Component/ListDrug/listDrugSlice';
+import { ItemsDeleted } from '../src/screen/TrushDrugScreen/component/ListDrugDeleted/listDrugDeletedSlice';
 
 
 export interface Price extends Realm.Dictionary {
@@ -13,7 +13,7 @@ export interface Price extends Realm.Dictionary {
 }
 
 export interface ListAdd {
-    _id : number, img : string | null, 
+    _id: string, MSSP : number, img : string | null, 
     name : string, price : typePrice, 
     NSX : string, HSD : string, 
     regisNumber: string, active: string,
@@ -22,8 +22,11 @@ export interface ListAdd {
     countrySX: string,countryDK: string
 }
 
+
+
 export class Drug extends Realm.Object {
-    _id!: number;
+    _id!: string;
+    MSSP!: number;
     img?: string;
     name!: string;
     price!: Price;
@@ -43,7 +46,8 @@ export class Drug extends Realm.Object {
         name: "Drug",
         primaryKey: "_id",
         properties: {
-            _id: "int",
+            _id: "string",
+            MSSP: "int",
             img: "string?",
             name: "string",
             price: "mixed{}",
@@ -77,11 +81,34 @@ export class QueueDrug {
             + item.price.unit
         }));
     }
+
+    getDetailDrug(realm : Realm, id : number) : any {
+        const data = realm.objectForPrimaryKey("Drug", id);
+        return data;
+    }
     
+   updateDrug(realm: Realm, newProduct: any) {
+        const product = realm.objects("Drug").filtered("_id == $0", newProduct._id)[0];
+        if (product) {
+            realm.write(() => {
+                Object.entries(newProduct).forEach(([key, value]) => {
+                    if (key === '_id') {
+                        return;
+                    }
+                    if (key === 'price') {
+                        product[key] = { ...newProduct.price };
+                        return;
+                    }
+                    product[key] = newProduct[key];
+                });
+            });
+        }
+    }
+
     addDrug(
         realm : Realm, listAdd: ListAdd ): Inform {
             
-        const existingDrug = realm.objectForPrimaryKey("Drug", listAdd._id);
+        const existingDrug =  realm.objects("Drug").filtered("MSSP == $0", listAdd.MSSP)[0];
         if(existingDrug ) {
             return {
                 text: "Sản phẩm đã tồn tại!",
@@ -91,6 +118,7 @@ export class QueueDrug {
             realm.write(() => {
                 realm.create("Drug",{
                     _id: listAdd._id,
+                    MSSP: listAdd.MSSP,
                     img: listAdd.img,
                     name: listAdd.name,
                     price: listAdd.price,
@@ -116,7 +144,7 @@ export class QueueDrug {
        
     }
 
-    softDelete(realm: Realm, id: number[]) : Inform  {
+    softDelete(realm: Realm, id: (string | -1)[]) : Inform  {
         const drugsToSoftDelete = realm.objects("Drug").filtered("_id IN $0",id)
         if(drugsToSoftDelete) {
             realm.write(async () => {

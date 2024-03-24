@@ -1,11 +1,11 @@
 import { configureStore} from "@reduxjs/toolkit";
-import rootAddScreenReducer from "../src/AddDrugScreen/combineSlice";
-import rootModalReducer from "../modal/combineModal";
+import rootAddScreenReducer from "../src/screen/AddDrugScreen/combineSlice";
+import rootModalReducer from "../src/Component/combineModal";
 import { useDispatch } from "react-redux";
-import scanBarSlice from "../src/ScanBarCodeScreen/scanBarSlice";
-import rootDrugReducer from "../src/MainScreen/DrugPage/combineReducer";
-import trushDrugSlice from "../src/TrushDrugScreen/component/ListDrugDeleted/listDrugDeletedSlice";
-import rootTrushDrugReducer from "../src/TrushDrugScreen/combineReducer";
+import scanBarSlice from "../src/screen/ScanBarCodeScreen/scanBarSlice";
+import rootDrugReducer from "../src/screen/MainScreen/DrugPage/combineReducer";
+import trushDrugSlice from "../src/screen/TrushDrugScreen/component/ListDrugDeleted/listDrugDeletedSlice";
+import rootTrushDrugReducer from "../src/screen/TrushDrugScreen/combineReducer";
 
 const middlewares : any[] = [
     

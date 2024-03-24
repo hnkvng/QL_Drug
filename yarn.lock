@@ -1395,6 +1395,8 @@
 
 "@pushpendersingh/react-native-scanner@^1.0.2":
   version "1.0.2"
+  resolved "https://registry.npmjs.org/@pushpendersingh/react-native-scanner/-/react-native-scanner-1.0.2.tgz"
+  integrity sha512-/i30pqbr0I0Ew377on7vSbZSzsgSrFcbhLiqhP+ibXbdMBjk+1ax70lm9uAFRAkFuc1TJkWjYma5scaUXAYBzw==
 
 "@react-native-community/cli-clean@12.3.2":
   version "12.3.2"
@@ -2010,6 +2012,11 @@
 
 "@types/use-sync-external-store@^0.0.3":
   version "0.0.3"
+
+"@types/uuid@^9.0.8":
+  version "9.0.8"
+  resolved "https://registry.npmjs.org/@types/uuid/-/uuid-9.0.8.tgz"
+  integrity sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA==
 
 "@types/yargs-parser@*":
   version "21.0.3"
@@ -2766,6 +2773,8 @@ depd@2.0.0:
 
 deprecated-react-native-prop-types@^5.0.0:
   version "5.0.0"
+  resolved "https://registry.npmjs.org/deprecated-react-native-prop-types/-/deprecated-react-native-prop-types-5.0.0.tgz"
+  integrity sha512-cIK8KYiiGVOFsKdPMmm1L3tA/Gl+JopXL6F5+C7x39MyPsQYnP57Im/D6bNUzcborD7fcMwiwZqcBdBXXZucYQ==
   dependencies:
     "@react-native/normalize-colors" "^0.73.0"
     invariant "^2.2.4"
@@ -3158,6 +3167,11 @@ expect@^29.7.0:
     jest-matcher-utils "^29.7.0"
     jest-message-util "^29.7.0"
     jest-util "^29.7.0"
+
+fast-base64-decode@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/fast-base64-decode/-/fast-base64-decode-1.0.0.tgz"
+  integrity sha512-qwaScUgUGBYeDNRnbc/KyllVU88Jk1pRHPStuF/lO7B0/RTRLj7U0lkdTAutlBblY08rwZDff6tNU9cjv6j//Q==
 
 fast-deep-equal@^3.1.1, fast-deep-equal@^3.1.3:
   version "3.1.3"
@@ -4219,7 +4233,7 @@ lodash.merge@^4.6.2:
 lodash.throttle@^4.1.1:
   version "4.1.1"
 
-lodash@^4.17.21:
+lodash@^4.14.2, lodash@^4.17.21:
   version "4.17.21"
 
 log-symbols@^4.1.0:
@@ -4926,6 +4940,13 @@ react-native-animatable@1.3.3:
   dependencies:
     prop-types "^15.7.2"
 
+react-native-camera-kit@^13.0.0:
+  version "13.0.0"
+  resolved "https://registry.npmjs.org/react-native-camera-kit/-/react-native-camera-kit-13.0.0.tgz"
+  integrity sha512-fnkyivCG2xzS+14/doP8pCAYNafYaTyg5J0t+JJltJdgKSHf328OG44Rd+fnbbEOydZxgy/bcuLB24R0kCbynw==
+  dependencies:
+    lodash "^4.14.2"
+
 react-native-dropdown-picker@^5.4.6:
   version "5.4.6"
   resolved "https://registry.npmjs.org/react-native-dropdown-picker/-/react-native-dropdown-picker-5.4.6.tgz"
@@ -4947,6 +4968,13 @@ react-native-gesture-handler@^2.14.1, "react-native-gesture-handler@>= 1.0.0":
     invariant "^2.2.4"
     lodash "^4.17.21"
     prop-types "^15.7.2"
+
+react-native-get-random-values@^1.11.0:
+  version "1.11.0"
+  resolved "https://registry.npmjs.org/react-native-get-random-values/-/react-native-get-random-values-1.11.0.tgz"
+  integrity sha512-4BTbDbRmS7iPdhYLRcz3PGFIpFJBwNZg9g42iwa2P6FOv9vZj/xJc678RZXnLNZzd0qd7Q3CCF6Yd+CU2eoXKQ==
+  dependencies:
+    fast-base64-decode "^1.0.0"
 
 react-native-image-picker@^7.1.0:
   version "7.1.0"
@@ -4989,8 +5017,10 @@ react-native-paper@^5.12.3:
     color "^3.1.2"
     use-latest-callback "^0.1.5"
 
-react-native-permissions@^4.1.0:
-  version "4.1.0"
+react-native-permissions@^4.1.4:
+  version "4.1.4"
+  resolved "https://registry.npmjs.org/react-native-permissions/-/react-native-permissions-4.1.4.tgz"
+  integrity sha512-el6u90VZNFDEtmHpSheirwRhGvs6M5rSZcoqIqB128IPO00f2c1q+PP4kEaM1u19Q0ldQ+R+S7C/l8Zrduy6JQ==
 
 react-native-progress@^5.0.1:
   version "5.0.1"
@@ -5038,7 +5068,7 @@ react-native-vector-icons@*, react-native-vector-icons@^10.0.3:
     prop-types "^15.7.2"
     yargs "^16.1.1"
 
-react-native@*, react-native@^0.73.2, react-native@>=0.42.0, react-native@>=0.48.4, react-native@>=0.57, react-native@>=0.65.0, react-native@>=0.68, react-native@>=0.69, react-native@>=0.70.0, react-native@>=0.71.0, react-native@>0.62.0:
+react-native@*, react-native@^0.73.2, react-native@>=0.42.0, react-native@>=0.48.4, react-native@>=0.56, react-native@>=0.57, react-native@>=0.65.0, react-native@>=0.68, react-native@>=0.69, react-native@>=0.70.0, react-native@>=0.71.0, react-native@>0.62.0:
   version "0.73.4"
   dependencies:
     "@jest/create-cache-key-function" "^29.6.3"
@@ -5819,6 +5849,11 @@ util-deprecate@^1.0.1, util-deprecate@~1.0.1:
 
 utils-merge@1.0.1:
   version "1.0.1"
+
+uuid@^9.0.1:
+  version "9.0.1"
+  resolved "https://registry.npmjs.org/uuid/-/uuid-9.0.1.tgz"
+  integrity sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==
 
 v8-to-istanbul@^9.0.1:
   version "9.2.0"
