@@ -1,0 +1,8 @@
+{
+  "extends": "@react-native/typescript-config/tsconfig.json",
+  "compilerOptions": {
+    "module": "esnext", // hoặc giá trị khác phù hợp với yêu cầu của bạn
+    "target": "esnext", // cũng có thể cần cập nhật target
+    // các tùy chọn khác
+  }
+}
