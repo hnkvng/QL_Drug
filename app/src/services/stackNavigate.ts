@@ -1,12 +1,16 @@
 import { StackScreenProps } from "@react-navigation/stack";
 
-export type addScreenParam =  {
+type addScreenParam =  {
     avatar?: string,
     MST?: string,
     tenThuoc?: string,
     NSX?: string,
     HSD?: string,
     giaBan?: [],
+}
+
+type scanScreenParam =  {
+    setCode: (code : string) => void
 }
 
 // export type detailScreenParam =  {
@@ -16,7 +20,9 @@ export type addScreenParam =  {
 export type RootStackParamList = {
     layout: undefined,
     addScreen: addScreenParam | undefined,
-    scanScreen: undefined,
+    scanScreen: scanScreenParam | undefined,
+    searchScreen: undefined,
 };
 
 export type  addScreenParamProp = StackScreenProps<RootStackParamList,'addScreen'>
+export type  scanScreenParamProp = StackScreenProps<RootStackParamList,'scanScreen'>

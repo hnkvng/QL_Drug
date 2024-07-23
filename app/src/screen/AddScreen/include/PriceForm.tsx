@@ -49,6 +49,7 @@ const PriceForm : ComponentProps<PriceFormProps> = ({
                 inputMode= {PRICE_ADD_FORM.inputMode.donVi}
                 placeholder= {PRICE_ADD_FORM.placeholder.donVi}
                 handleChange= {handleChange("donVi")}
+                maxLength= {PRICE_ADD_FORM.maxLength.donVi}
             />
             <InputApp
                 label= {PRICE_ADD_FORM.label.soLuong(nameItem)}
@@ -57,6 +58,7 @@ const PriceForm : ComponentProps<PriceFormProps> = ({
                 inputMode= {PRICE_ADD_FORM.inputMode.soLuong}
                 placeholder= {PRICE_ADD_FORM.placeholder.soLuong(nameItem)}
                 handleChange= {handleChange("soLuong")}
+                maxLength= {PRICE_ADD_FORM.maxLength.soLuong}
             />
             <View 
                 style ={{

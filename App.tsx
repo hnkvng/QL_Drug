@@ -2,8 +2,8 @@ import {lazy} from 'react';
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-// import { Provider as StoreProvider } from 'react-redux';
-// import store from './app/redux/store';
+import { Provider as StoreProvider } from 'react-redux';
+import store from './app/src/redux/store';
 import {RootStackParamList} from './app/src/services/stackNavigate'
 import Layout from './app/layout';
 import { ComponentJSX } from './app/src/services/type';
@@ -12,18 +12,10 @@ import { PaperProvider } from 'react-native-paper';
 
 const AddScreen = lazy(() =>  import( './app/src/screen/AddScreen'));
 const ScanBarCodeScreen = lazy(() => import( './app/src/screen/ScanBarScreen'));
-// const SearchDrugScreen = lazy(() => import( './app/src/screen/SearchDrugScreen'));
+const SearchScreen = lazy(() => import('./app/src/screen/SearchScreen'));
 // import { deleteDB, getDBConnection, getDrugItems } from './app/database/db-service';
 
-import { connectToDevTools } from "react-devtools-core";
-// import { deleteDB } from './app/src/services/db';
-
-if (__DEV__) {
-  connectToDevTools({
-    host: "localhost",
-    port: 8081,
-  });
-}
+import { deleteDB } from './app/src/services/db';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -41,7 +33,7 @@ const Stack = createStackNavigator<RootStackParamList>();
 const App = () : ComponentJSX => {
   
   return (
-    // <StoreProvider store={store} >
+    <StoreProvider store={store} >
       <PaperProvider theme={theme}>
           <NavigationContainer>
             <Stack.Navigator 
@@ -66,12 +58,12 @@ const App = () : ComponentJSX => {
             >
               <Stack.Screen options={{headerShown:false}} name='layout' component={Layout}/>
               <Stack.Screen options={{title: 'Thêm thuốc'}} name='addScreen' component={AddScreen}/>
-              {/* <Stack.Screen options={{title: 'Tìm kiếm thuốc'}}name='searchScreen' component={SearchDrugScreen}/> */}
+              <Stack.Screen options={{title: 'Tìm kiếm thuốc'}} name='searchScreen' component={SearchScreen}/>
               <Stack.Screen options={{title: 'Scan'}} name='scanScreen' component={ScanBarCodeScreen}/>
             </Stack.Navigator>
           </NavigationContainer>
       </PaperProvider>
-    // </StoreProvider>
+    </StoreProvider>
   );
 }
 

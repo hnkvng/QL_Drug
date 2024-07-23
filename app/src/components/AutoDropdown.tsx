@@ -1,10 +1,11 @@
-import { useEffect, useState, memo } from 'react';
+import { useEffect, useState, memo, ChangeEvent } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-searchable-dropdown-kj';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { ComponentJSX, ComponentProps } from '../services/type';
 import { HelperText } from 'react-native-paper';
 import { TextInput } from 'react-native-gesture-handler';
+import { theme } from '../services/theme';
 
 interface AutoDropdownProps {
   label: string,
@@ -17,8 +18,8 @@ interface AutoDropdownProps {
   setData: any,
   placeholder?: string,
   iconL: string,
-  handleChange: any,
-  setSoDangKy: any,
+  handleChange: (e: string | ChangeEvent<any>) => void,
+  setSoDangKy:  React.Dispatch<React.SetStateAction<string>>,
 }
 
 const AutoDropdown : ComponentProps<AutoDropdownProps> = ({
@@ -39,7 +40,7 @@ const AutoDropdown : ComponentProps<AutoDropdownProps> = ({
     if (value || isFocus) {
       return (
         <Text 
-          style={[styles.label, error ? { color: 'red' } :isFocus && { color: 'blue' }]}
+          style={[styles.label, error ? { color: 'red' } :isFocus && { color: theme.colors.mainColor }]}
           numberOfLines={1}
           ellipsizeMode= "middle"
         >
@@ -63,7 +64,7 @@ const AutoDropdown : ComponentProps<AutoDropdownProps> = ({
           style={[
             styles.dropdown, 
             error ? { borderColor: 'red', borderWidth: 2} 
-            : isFocus && { borderColor: 'blue' }
+            : isFocus && { borderColor: theme.colors.mainColor }
           ]}
           placeholderStyle={[styles.placeholderStyle, error ? {color: 'red'} : {}]}
           selectedTextStyle={styles.selectedTextStyle}
@@ -111,7 +112,7 @@ const AutoDropdown : ComponentProps<AutoDropdownProps> = ({
           renderLeftIcon={() => (
             <AntDesign
               style={styles.icon}
-              color={error ? 'red' : isFocus ? 'blue' : 'black'}
+              color={error ? 'red' : isFocus ? theme.colors.mainColor : 'black'}
               name= {iconL}
               size={20}
             />

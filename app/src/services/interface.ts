@@ -14,21 +14,8 @@ export interface FormPrice {
     soLuong: string,
 };
 
-export type DrugItem = {
-    avatar: string,
+export interface DataSearchDrug {
+    label: string,
+    value: string,
     soDangKy: string,
-    MST: number;
-    tenThuoc: string;
-    NSX: string,
-    HSD: string,
-}
-
-export type PriceItem = {
-    giaBan: string,
-    donVi: string,
-    soLuong: number,
-}
-
-export type Error = {
-    message: string
 }

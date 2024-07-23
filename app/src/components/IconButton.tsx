@@ -1,34 +1,29 @@
 import {memo} from "react";
 import { ComponentJSX, ComponentProps} from "../services/type";
 import { IconButton } from "react-native-paper";
+import { IconSource } from "react-native-paper/lib/typescript/components/Icon";
 
 
 interface IconButtonAppProps {
-    color? : 
-        "inherit" | 
-        "default" | 
-        "primary" | 
-        "secondary" | 
-        "error" | 
-        "info" | 
-        "success" | 
-        "warning", 
-    icon : ComponentJSX, 
+    color? : string, 
+    icon : IconSource, 
+    size: number,
     handleClick : () => void,
 }
 
 const IconButtonApp : ComponentProps<IconButtonAppProps> = ({
     color = "default", 
     icon, 
+    size,
     handleClick
     }) : ComponentJSX => {
 
     return (
         <IconButton
-            icon="camera"
-            // iconColor={MD3Colors.error50}
-            size={20}
-            onPress={() => console.log('Pressed')}
+            icon= {icon}
+            iconColor={color}
+            size={size}
+            onPress={handleClick}
         />
     )
 }

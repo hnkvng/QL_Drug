@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Image, StyleSheet, View } from "react-native";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Text } from 'react-native-paper';
 import { TouchableOpacity } from "react-native-gesture-handler";
 import ChooseImg from "../../../components/ChooseImg";
-import { useFormikContext } from "formik";
-import { DrugItem } from "../../../services/interface";
 import { ComponentProps } from "../../../services/type";
 
 interface  ImageDrugProps {

@@ -10,7 +10,7 @@ import { useNavigation } from "@react-navigation/native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 type PropsNavigation = StackNavigationProp<RootStackParamList,
-    // | "searchScreen" 
+    | "searchScreen" 
     | "addScreen" 
     // | "trashScreen"
 >;

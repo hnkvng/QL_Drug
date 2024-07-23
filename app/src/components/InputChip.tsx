@@ -60,9 +60,9 @@ const InputChip : ComponentProps<InputChipProps> = ({
                 )}
             >
             </TextInput>
-            {error && <HelperText type="error" visible={error ? true : false}>
+            <HelperText type="error" visible={error ? true : false}>
                 {error}
-            </HelperText>}   
+            </HelperText>
         </View>
     );
 }

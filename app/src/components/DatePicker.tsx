@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from 'react'
+import React, { memo, useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import DatePicker from 'react-native-date-picker'
 
 interface DatePickerComonentProps {
@@ -11,12 +11,17 @@ interface DatePickerComonentProps {
 const DatePickerComonent : React.FC<DatePickerComonentProps> = ({title, open, setOpen, handleChange}) : React.JSX.Element => {
   const [date, setDate] = useState(new Date());
 
-  useEffect(() => {
-    const day = date.getDate() < 10 ? 0 + date.getDate() : date.getDate();
-    const month = date.getMonth() + 1 < 10 ? 0 + date.getMonth() + 1 : date.getMonth() + 1;
-    const year = date.getFullYear();
+  const handleDate = (dates : Date) => {
+    const day = dates.getDate() < 10 ? "0" + dates.getDate() : dates.getDate();
+    const month = dates.getMonth() + 1 < 10 ? "0" + (dates.getMonth() + 1): dates.getMonth() + 1;
+    const year = dates.getFullYear();
     handleChange(`${year}-${month}-${day}`);
-  },[date])
+  }
+
+  useEffect(() => {
+    if(!open)
+      setDate(new Date());
+  },[open])
 
   return (
     <DatePicker
@@ -26,8 +31,9 @@ const DatePickerComonent : React.FC<DatePickerComonentProps> = ({title, open, se
         open={open}
         date={date}
         onConfirm={(date) => {
-          setDate(date)
-          setOpen(false)
+          setDate(date);
+          handleDate(date);
+          setOpen(false);
         }}
         onCancel={() => {
             setOpen(false);

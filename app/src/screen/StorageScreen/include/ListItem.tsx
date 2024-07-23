@@ -1,31 +1,46 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Card, Text, Title, TouchableRipple } from 'react-native-paper';
+import { useCallback, useEffect, useMemo, useState, memo } from "react";
+import { Card, Text, Title } from 'react-native-paper';
 import { theme } from "../../../services/theme";
 import { StyleSheet,  Linking} from "react-native";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { View } from "react-native";
-import { getDBConnection, getDrugItems } from "../../../services/db";
-import { DrugItem } from "../../../services/interface";
+import { DrugItem, propsNameIcon, sortData } from "../../../services/type";
 import { ActivityIndicator, MD2Colors } from 'react-native-paper';
-import { ComponentJSX } from "../../../services/type";
+import { ComponentJSX, ComponentProps } from "../../../services/type";
 import { EXTERNAL_API_BASE_URLS, EXTERNAL_API_ENDPOINTS } from "../../../services/api";
 import { TouchableOpacity } from "react-native";
 
-type propsNameIcon = 'sort-ascending' | 'sort-descending';
 
-const ListItem = () : ComponentJSX => {
+
+interface ListItemProps {
+    name: string,
+    title: string,
+    data: DrugItem[],
+    loading: boolean,
+    setSortData: React.Dispatch<React.SetStateAction<{
+        sortDataList1: sortData;
+        sortDataList2: sortData;
+        sortDataList3: sortData;
+    }>>,
+}
+
+const ListItem : ComponentProps<ListItemProps> = ({
+    name,
+    title,
+    data,
+    loading,
+    setSortData
+    }) : ComponentJSX => {
 
     const sizeIconNextPage = 30;
     const MAX_ITEM_IN_PAGE = 6;
     const MAX_PAGE = 7;
 
-    const [sortData, setSortData] = useState<"ASC" | "DESC">("ASC");
     const [iconSortData, setIconSortData] = useState<propsNameIcon>('sort-ascending');
-    const [DATA, setDATA] = useState<DrugItem[]>([]);
     const [current, setCurrent] = useState(1);
     const [pageMin, setPageMin] = useState(1);
     const [pageMax, setPageMax] = useState(MAX_PAGE);
-    const [loading, setLoading] = useState(false);
+    
 
     const STT = (index : number) => {
         return MAX_ITEM_IN_PAGE*(current - 1) + index + 1
@@ -36,24 +51,24 @@ const ListItem = () : ComponentJSX => {
     const endPage = useCallback((index : number) => {
 
         const math = MAX_ITEM_IN_PAGE + MAX_ITEM_IN_PAGE*index
-        const lengthData = DATA.length;
+        const lengthData = data.length;
 
         if(math < lengthData) {
             return math
         } 
         return lengthData
-    },[DATA])
+    },[data])
 
     
 
     const Page = useMemo(() => {
 
-        const lengthData = DATA.length;
+        const lengthData = data.length;
 
         return Array.from({length: Math.ceil(lengthData/6)}, (_, index) => 
-        DATA.slice(startPage(index), endPage(index)))
+        data.slice(startPage(index), endPage(index)))
     }
-    ,[DATA]);
+    ,[data]);
 
     const rightTitle = useCallback((props : any) => 
         <Icon 
@@ -61,7 +76,7 @@ const ListItem = () : ComponentJSX => {
             name = {iconSortData} 
             onPress={() => handleNameIcon(iconSortData)}
         />
-    ,[sortData]);
+    ,[iconSortData]);
 
     const pageIndex = useMemo(() => (
         <>
@@ -158,39 +173,46 @@ const ListItem = () : ComponentJSX => {
     },[Page])
 
     useEffect(() => {
-        switch(iconSortData) {
-            case 'sort-ascending':
-                setSortData("ASC");
-                return;
-            case 'sort-descending':
-                setSortData("DESC");
-                return;
-        };
+        switch(name ) {
+            case 'list1':
+                switch(iconSortData) {
+                    case 'sort-ascending':
+                        setSortData((sort) => ({...sort, sortDataList1: "ASC"}));
+                        return;
+                    case 'sort-descending':
+                        setSortData((sort) => ({...sort, sortDataList1: "DESC"}));
+                        return;
+                };
+            case 'list2':
+                switch(iconSortData) {
+                    case 'sort-ascending':
+                        setSortData((sort) => ({...sort, sortDataList2: "ASC"}));
+                        return;
+                    case 'sort-descending':
+                        setSortData((sort) => ({...sort, sortDataList2: "DESC"}));
+                        return;
+                };
+            case 'list3':
+                switch(iconSortData) {
+                    case 'sort-ascending':
+                        setSortData((sort) => ({...sort, sortDataList3: "ASC"}));
+                        return;
+                    case 'sort-descending':
+                        setSortData((sort) => ({...sort, sortDataList3: "DESC"}));
+                        return;
+                };
+        }
+        
     },[iconSortData])
 
     const handleDetail = (name: string, soDangKy: string) => {
         Linking.openURL(EXTERNAL_API_BASE_URLS.DRUG_BANK_URL + EXTERNAL_API_ENDPOINTS.DRUG_BANK.DETAIL_MEDICINE(name, soDangKy))
     }
 
-    useEffect(() => {
-        setLoading(true);
-        const db = getDBConnection();
-        db.then((schema) => {
-            getDrugItems(schema, sortData)
-            .then((data) => {
-                    setLoading(false);
-                    setDATA(data);
-            })
-            .catch((data) => {
-                console.log(data)
-                setLoading(false);
-            });
-        }) 
-    },[sortData])
-
+    
     return (
         <Card style = {[styles.card,{backgroundColor: theme.colors.mainColor}]}>
-            <Card.Title title='Danh sách' titleStyle = {styles.title} right={rightTitle}/>
+            <Card.Title title= {title} titleStyle = {styles.title} right={data.length > 1 ? rightTitle : undefined}/>
             
             <Card.Content>
                 {loading && <ActivityIndicator animating={true} color={MD2Colors.white} />}
@@ -318,4 +340,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default ListItem;
+export default memo(ListItem);

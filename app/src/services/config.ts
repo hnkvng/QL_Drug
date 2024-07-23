@@ -67,7 +67,10 @@ export const PRICE_ADD_FORM  = {
         donVi: 'Nhập đơn vị',
         soLuong: (name : string) =>  name !== '' ? `Nhập số lượng trên mỗi ${name}` : "Nhập số lượng",
     },
-
+    maxLength: {
+        donVi: 255,
+        soLuong: 6,
+    }
 }
 
 export const STATUS = {
@@ -82,5 +85,13 @@ export const STATUS = {
     error: {
         icon: "alert-circle-outline",
         color: "red",
+    }
+}
+
+export const LIST_DATA = {
+    title: {
+        list1: "Danh sách thuốc còn hạn",
+        list2: "Danh sách thuốc gần hết hạn",
+        list3: "Danh sách thuốc đã hết hạn",
     }
 }

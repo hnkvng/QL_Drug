@@ -1,5 +1,6 @@
 import {deleteDatabase, enablePromise, openDatabase, SQLiteDatabase} from 'react-native-sqlite-storage';
-import { DrugItem, FormDrug, PriceItem } from './interface';
+import {FormDrug } from './interface';
+import {DrugItem} from './type';
 
 const Drug = {
   name: 'Drug',
@@ -32,10 +33,10 @@ export const deleteDB = async () => {
   return deleteDatabase({name: 'Medicine', createFromLocation:'~Medicine.db'});
 }
 
-export const getDrugItems = async (db: SQLiteDatabase, arrange: "ASC" | "DESC"): Promise<DrugItem[]> => {
+export const getDrugItems = async (db: SQLiteDatabase, arrange: "ASC" | "DESC", condition: string = ""): Promise<DrugItem[]> => {
   try {
     const drugItem: DrugItem[] = [];
-    const results = await db.executeSql(`SELECT * FROM ${Drug.name} ORDER BY tenThuoc ${arrange}`);
+    const results = await db.executeSql(`SELECT * FROM ${Drug.name} ${condition} ORDER BY tenThuoc ${arrange}`);
     results.forEach(result => {
       for (let index = 0; index < result.rows.length; index++) {
         drugItem.push(result.rows.item(index))
@@ -48,17 +49,17 @@ export const getDrugItems = async (db: SQLiteDatabase, arrange: "ASC" | "DESC"):
 };
 
 export const getMemberDrug = async (db: SQLiteDatabase, date: "expired" | "almost expired" | "" = "" ) : Promise<{
-  sum: number,
+  stilldate: number,
   expired: number,
   almostExpired:number,
 }> => {
   try {
-    const sum = await db.executeSql(`SELECT * FROM ${Drug.name}`);
-    const almostExpired = await db.executeSql(`SELECT HSD FROM ${Drug.name} WHERE HSD <= DATE('now', '+30 days')`);
+    const stilldate = await db.executeSql(`SELECT HSD FROM ${Drug.name} WHERE HSD > DATE('now', '+30 days')`);
+    const almostExpired = await db.executeSql(`SELECT HSD FROM ${Drug.name} WHERE HSD <= DATE('now', '+30 days') AND HSD >  DATE('now')`);
     const expired = await db.executeSql(`SELECT HSD FROM ${Drug.name} WHERE  HSD <=  DATE('now')`);
     
     return {
-      sum: sum[0].rows.length,
+      stilldate: stilldate[0].rows.length,
       almostExpired: almostExpired[0].rows.length,
       expired: expired[0].rows.length,
     }

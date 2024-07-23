@@ -4,6 +4,7 @@ import { HelperText, TextInput } from 'react-native-paper';
 import { StyleProp, TextStyle, View } from "react-native";
 import MaskedTextInput, { Mask} from 'react-native-mask-input';
 import { IconSource } from "react-native-paper/lib/typescript/components/Icon";
+import { theme } from "../services/theme";
 
 interface InputAppProps {
     style? : StyleProp<TextStyle>,
@@ -60,9 +61,10 @@ const InputApp : ComponentProps<InputAppProps>  = ({
         <View>
             <TextInput
                 mode= 'outlined'
+                activeOutlineColor= {theme.colors.mainColor}
                 editable = {edit ?? true}
                 inputMode= {inputMode}
-                style = {{margin: 10}}
+                style = {{margin: 10}}   
                 label= {label}
                 value= {value}
                 error= {error ? true : false}

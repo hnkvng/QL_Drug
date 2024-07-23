@@ -4,42 +4,53 @@ import { Alert, Linking, StyleSheet, View } from "react-native";
 import { Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Camera, useCameraDevice, useCameraPermission, useCodeScanner } from "react-native-vision-camera";
-import { RootStackParamList } from "../../services/stackNavigate";
-import { useNavigation } from "@react-navigation/native";
+import { RootStackParamList, scanScreenParamProp } from "../../services/stackNavigate";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import Button from "../../components/Button";
+import { useDispatch } from "react-redux";
+import scanScreenSlice from "./slice";
 
 type PropsNavigation = StackNavigationProp<RootStackParamList,
     'addScreen'
 >;
 
 const ScanBarCodeScreen = () : React.JSX.Element => {
-      // State variables
+
+  const dispatch = useDispatch();
+
+  const setCode = scanScreenSlice.actions.setCode;
+  const reset = scanScreenSlice.actions.reset;
+
   const [torchOn, setTorchOn] = useState(false);
   const [enableOnCodeScanned, setEnableOnCodeScanned] = useState(true);
   const navigation = useNavigation<PropsNavigation>();
-  // Camera permission hooks
+
   const {
     hasPermission: cameraHasPermission,
     requestPermission: requestCameraPermission,
   } = useCameraPermission();
 
-  // Get the camera device (back camera)
+
   const device = useCameraDevice('back');
 
-  // Handle camera permission on component mount
+
   useEffect(() => {
     handleCameraPermission();
+    return () => {
+      dispatch(reset())
+    }
   }, []);
 
-  // Use the code scanner hook to configure barcode scanning
+
   const codeScanner = useCodeScanner({
     codeTypes: ['qr', 'ean-13'],
     onCodeScanned: (codes) => {
-      // Check if code scanning is enabled
       if (enableOnCodeScanned) {
         const value = codes[0]?.value;
         const type = codes[0]?.type;
         if(value) {
-          navigation.navigate('addScreen',{MST: value})
+          dispatch(setCode(value))
+          navigation.goBack()
           setEnableOnCodeScanned(false);
         }
           
@@ -47,7 +58,6 @@ const ScanBarCodeScreen = () : React.JSX.Element => {
     },
   });
 
-  // Handle camera permission
   const handleCameraPermission = async () => {
     const granted = await requestCameraPermission();
 
@@ -55,13 +65,10 @@ const ScanBarCodeScreen = () : React.JSX.Element => {
       Alert.alert(
         'Camera permission is required to use the camera. Please grant permission in your device settings.'
       );
-
-      // Optionally, open device settings using Linking API
       Linking.openSettings();
     }
   };
 
-  // Show alert with customizable content
   const showAlert = (
     value = '',
     countryOfOrigin = '',
@@ -96,10 +103,6 @@ const ScanBarCodeScreen = () : React.JSX.Element => {
     );
   };
 
-  // Round button component with image
-
-
-  // Render content based on camera device availability
   if (device == null)
     return (
       <View

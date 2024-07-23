@@ -3,7 +3,7 @@ import { ComponentJSX } from "../../../services/type";
 import ImageDrug from "./ImageDrug";
 import { StyleSheet, View } from "react-native";
 import { useFormikContext } from "formik";
-import { FormDrug, FormPrice } from "../../../services/interface";
+import { DataSearchDrug, FormDrug, FormPrice } from "../../../services/interface";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import DatePicker from "../../../components/DatePicker";
 import { useState, memo, useCallback, useMemo, useEffect } from "react";
@@ -21,7 +21,8 @@ import InputApp from "../../../components/InputApp";
 import AutoDropdown from "../../../components/AutoDropdown";
 import FetchApi from "../../../utils/fetchApi";
 import { EXTERNAL_API_BASE_URLS, EXTERNAL_API_ENDPOINTS } from "../../../services/api";
-
+import { useSelector } from "react-redux";
+import { getCodeScanScreen } from "../../../redux/selection";
 
 type PropsNavigation = StackNavigationProp<RootStackParamList,
     'scanScreen'
@@ -56,10 +57,12 @@ const AddForm = () : ComponentJSX => {
         soLuong: ''
     });
     
-   
+    const barCode =  useSelector(getCodeScanScreen);
     const lengthGiaBan = useMemo(() => values.giaBan.length, [values.giaBan]);
     
-    const ACTION_MST = useCallback(() => navigation.navigate('scanScreen'),[]);
+    const ACTION_MST = useCallback(() => {
+        navigation.navigate('scanScreen')
+    },[]);
 
     const ACTION_NSX = useCallback(() => {
         setOpenDate(true)
@@ -106,26 +109,22 @@ const AddForm = () : ComponentJSX => {
     },[values.giaBan, indexEdit]);
 
     useEffect(() => {
-        setValues((data) => ({...data,...params})) 
-    },[params])
-
-    useEffect(() => {
         if(searchText) {
             const api = new FetchApi(EXTERNAL_API_BASE_URLS.DRUG_BANK_API);
             api.get(EXTERNAL_API_ENDPOINTS.DRUG_BANK.SEARCH_MEDICINE(searchText))
             .then((data) => {
-                const listData = data.map((value : any) => ({
+                const listData : DataSearchDrug[] = data.map((value : any) => ({
                     label: value.tenThuoc.toLowerCase().trim(), 
                     value: value.tenThuoc.toLowerCase().trim(),
                     soDangKy: value.soDangKy,
                 }))
 
-                setDataSearch(() => listData.reduce((accumulator : [], currentValue : any) => {
+                setDataSearch(() => listData.reduce((accumulator, currentValue : DataSearchDrug) => {
                     if (accumulator.length > 0) {
-                        if(!accumulator.find((item) => item.value == currentValue.value))
-                            accumulator.push(currentValue);
+                        if(!accumulator.find((item : DataSearchDrug) => item.value == currentValue.value))
+                            accumulator.push(currentValue as never);
                     } else {
-                        accumulator.push(currentValue);
+                        accumulator.push(currentValue as never);
                     }
                     return accumulator;
                 }, []))
@@ -139,6 +138,16 @@ const AddForm = () : ComponentJSX => {
     useEffect(() => {
         values.soDangKy = soDangKy;
     },[soDangKy])
+
+    useEffect(() => {
+        if(barCode) {
+            setFieldValue("MST", barCode);
+        }
+    },[barCode])
+
+    useEffect(() => {
+        setValues((data) => ({...data,...params})) 
+    },[params])
 
     return (
         <>

@@ -7,7 +7,7 @@ import { ViewStyle } from "react-native";
 
 interface ButtonAppProps {
     style?: ViewStyle,
-    name: string,
+    name?: string,
     textColor?: string,
     mode?:  "text" | "outlined" | "contained" | "elevated" | "contained-tonal",
     icon?: IconSource | undefined,

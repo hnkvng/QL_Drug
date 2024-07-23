@@ -13,8 +13,24 @@ const schema = Yup.object().shape({
     tenThuoc: Yup.string()
         .required('Không được để trống!'),
     NSX: Yup.string()
+        .test('maxDate', "Ngày sản xuất không được lớn hơn ngày hiện tại", (value) => {
+            if(value && (new Date() < new Date(value))) {
+                return false;
+            }
+            return true;
+        }) 
         .required('Không được để trống!'),
     HSD: Yup.string()
+        .test('minDate', "Hạn sử dụng không được nhỏ hơn hoặc bằng ngày sản xuất", (value, form) => {
+            if(form.options.context) 
+            if( value && 
+                form.options.context.NSX && 
+                (new Date(form.options.context.NSX) >= new Date(value))
+            ) {
+                return false;
+            }
+            return true;
+        }) 
         .required('Không được để trống!'),
     giaBan: Yup.array()
         .required('Không được để trống!')
