@@ -8,9 +8,11 @@ import { memo } from "react";
 import Button from "../../../components/Button";
 import { View } from "react-native";
 import { createNumberMask } from "react-native-mask-input";
+import { Title } from "react-native-paper";
  
 interface PriceFormProps {
-    nameItem: string,
+    title: string,
+    nameButton: string,
 }
 
 const vndMark = createNumberMask({
@@ -21,7 +23,8 @@ const vndMark = createNumberMask({
   
 
 const PriceForm : ComponentProps<PriceFormProps> = ({
-    nameItem,
+    title,
+    nameButton,
     }) : ComponentJSX => {
     const {
         values,
@@ -33,6 +36,7 @@ const PriceForm : ComponentProps<PriceFormProps> = ({
 
     return (
         <KeyboardAwareScrollView>
+            <Title>{title}</Title>
             <InputApp
                 label= {PRICE_ADD_FORM.label.giaBan}
                 value= {values.giaBan}
@@ -52,11 +56,11 @@ const PriceForm : ComponentProps<PriceFormProps> = ({
                 maxLength= {PRICE_ADD_FORM.maxLength.donVi}
             />
             <InputApp
-                label= {PRICE_ADD_FORM.label.soLuong(nameItem)}
+                label= {PRICE_ADD_FORM.label.soLuong}
                 value= {values.soLuong}
                 error= {errors.soLuong}
                 inputMode= {PRICE_ADD_FORM.inputMode.soLuong}
-                placeholder= {PRICE_ADD_FORM.placeholder.soLuong(nameItem)}
+                placeholder= {PRICE_ADD_FORM.placeholder.soLuong}
                 handleChange= {handleChange("soLuong")}
                 maxLength= {PRICE_ADD_FORM.maxLength.soLuong}
             />
@@ -74,7 +78,7 @@ const PriceForm : ComponentProps<PriceFormProps> = ({
                     handleClick={() => setValues(() => PRICE_ADD_FORM.initValue)}
                 />
                 <Button
-                    name="Thêm"
+                    name= {nameButton}
                     disabled= {Object.values(errors).some(text => text)}
                     handleClick={handleSubmit}
                 />

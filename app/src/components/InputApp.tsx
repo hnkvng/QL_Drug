@@ -20,7 +20,7 @@ interface InputAppProps {
     iconR?: IconSource,
     iconL?: IconSource,
     action?: () => void,
-    handleChange : (e: string | ChangeEvent<any>) => void, 
+    handleChange? : (e: string | ChangeEvent<any>) => void, 
 }
 
 const InputApp : ComponentProps<InputAppProps>  = ({
@@ -42,7 +42,7 @@ const InputApp : ComponentProps<InputAppProps>  = ({
     const iconRight = useCallback(() : ReactNode => {
         if(value !== '') {
             return (
-                <TextInput.Icon 
+                handleChange  && <TextInput.Icon 
                     icon={"close"}
                     onPress={() => 
                         handleChange('')
@@ -70,7 +70,7 @@ const InputApp : ComponentProps<InputAppProps>  = ({
                 error= {error ? true : false}
                 placeholder= {placeholder}
                 maxLength= {maxLength}
-                onChangeText={(value) => handleChange(value.trim())}
+                onChangeText={handleChange && ((value) => handleChange(value.trim()))}
                 right = {iconRight()}
                 left = {iconL && <TextInput.Icon icon= {iconL} disabled></TextInput.Icon>}
                 multiline = {multiline}

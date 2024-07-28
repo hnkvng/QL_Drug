@@ -30,7 +30,8 @@ const ChooseImg : React.FC<ChooseImgProps> = ({
     },[]);
     
     const takePhoto = useCallback(() => {
-        handleImg(launchCamera).then((data) => getImg(data.uri))
+        handleImg(launchCamera)
+        .then((data) => getImg(data.uri))
         toggleModal();
     },[]);
 

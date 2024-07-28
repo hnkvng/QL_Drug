@@ -57,7 +57,7 @@ const App = () : ComponentJSX => {
               }}
             >
               <Stack.Screen options={{headerShown:false}} name='layout' component={Layout}/>
-              <Stack.Screen options={{title: 'Thêm thuốc'}} name='addScreen' component={AddScreen}/>
+              <Stack.Screen options={{title: 'Thêm thuốc', headerShown: false}} name='addScreen' component={AddScreen}/>
               <Stack.Screen options={{title: 'Tìm kiếm thuốc'}} name='searchScreen' component={SearchScreen}/>
               <Stack.Screen options={{title: 'Scan'}} name='scanScreen' component={ScanBarCodeScreen}/>
             </Stack.Navigator>

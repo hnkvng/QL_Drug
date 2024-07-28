@@ -1,12 +1,12 @@
 import { ADD_FORM, PRICE_ADD_FORM } from "../../../services/config";
-import { ComponentJSX } from "../../../services/type";
+import { ComponentJSX, ComponentProps } from "../../../services/type";
 import ImageDrug from "./ImageDrug";
 import { StyleSheet, View } from "react-native";
 import { useFormikContext } from "formik";
 import { DataSearchDrug, FormDrug, FormPrice } from "../../../services/interface";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import DatePicker from "../../../components/DatePicker";
-import { useState, memo, useCallback, useMemo, useEffect } from "react";
+import { useState, memo, useCallback, useMemo, useEffect, useLayoutEffect } from "react";
 import InputChip from "../../../components/InputChip";
 import ModalApp from "../../../components/Modal";
 import FormikApp from "../../../components/FormikApp";
@@ -15,20 +15,27 @@ import PriceFrom from "./PriceForm";
 import Button from "../../../components/Button";
 import { theme } from "../../../services/theme";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../../services/stackNavigate";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import {  RootStackParamList } from "../../../services/stackNavigate";
+import { useNavigation } from "@react-navigation/native";
 import InputApp from "../../../components/InputApp";
 import AutoDropdown from "../../../components/AutoDropdown";
 import FetchApi from "../../../utils/fetchApi";
 import { EXTERNAL_API_BASE_URLS, EXTERNAL_API_ENDPOINTS } from "../../../services/api";
 import { useSelector } from "react-redux";
 import { getCodeScanScreen } from "../../../redux/selection";
+import { List } from 'react-native-paper';
 
 type PropsNavigation = StackNavigationProp<RootStackParamList,
     'scanScreen'
 >;
 
-const AddForm = () : ComponentJSX => {
+interface AddFormProps {
+    nameButton: string,
+}
+
+const AddForm : ComponentProps<AddFormProps> = ({
+    nameButton
+    }) : ComponentJSX => {
     const {
         values,
         errors,
@@ -40,9 +47,13 @@ const AddForm = () : ComponentJSX => {
 
     const navigation = useNavigation<PropsNavigation>();
 
-    const {params} = useRoute();
+    const [layoutPrice, setLayoutPrice] = useState({
+        title: '',
+        nameButton: ''
+    });
 
-    const [check, setCheck] = useState('');
+    const [expanded, setExpanded] = useState(true);
+    const [expanded1, setExpanded1] = useState(false);
     const [titleDate, setTitleDate] = useState('');
     const [openDate, setOpenDate] = useState(false);
     const [fieldDate, setFieldDate] = useState('');
@@ -50,13 +61,7 @@ const AddForm = () : ComponentJSX => {
     const [indexEdit, setIndexEdit] = useState(null);
     const [searchText, setSearchText] = useState('');
     const [dataSearch, setDataSearch] = useState([]);
-    const [soDangKy, setSoDangKy] = useState('');
-    const [valuesPrice, setValuesPrice] = useState<FormPrice>({
-        giaBan: '',
-        donVi: '',
-        soLuong: ''
-    });
-    
+    const [formPrice, setFormPrice] = useState<FormPrice>(PRICE_ADD_FORM.initValue);
     const barCode =  useSelector(getCodeScanScreen);
     const lengthGiaBan = useMemo(() => values.giaBan.length, [values.giaBan]);
     
@@ -78,20 +83,27 @@ const AddForm = () : ComponentJSX => {
 
     const ACTION_GIA_BAN = useCallback(() => {
         setOpenModalPrice(true)
-        setValuesPrice({
+        setFormPrice({
             giaBan: '',
             donVi: '',
             soLuong: ''
         })
         setIndexEdit(null);
-        setCheck(lengthGiaBan > 0 ? values.giaBan[lengthGiaBan - 1].donVi : '')
+        setLayoutPrice(() => ({
+            title: `Cấp ${lengthGiaBan + 1}${lengthGiaBan == 0 ? "(Cấp cao nhất)": ""}`,
+            nameButton: "Thêm",
+        }))
     },[lengthGiaBan, values.giaBan]);
 
     const handlePressGiaBan = useCallback((value : any, index : any) => {
         setIndexEdit(index);
-        setValuesPrice(value);
+        setFormPrice(value);
         setOpenModalPrice(true);
-        setCheck(index > 0 ? values.giaBan[index - 1].donVi : '');
+        setLayoutPrice(() => ({
+            title: `Cấp ${index + 1}${index == 0 ? "(Cấp cao nhất)": ""}`,
+            nameButton: "Thay đổi",
+        }))
+        console.log(index)
     },[values.giaBan]);
 
     const handleCloseGiaBan = useCallback((value : any) => {
@@ -117,6 +129,18 @@ const AddForm = () : ComponentJSX => {
                     label: value.tenThuoc.toLowerCase().trim(), 
                     value: value.tenThuoc.toLowerCase().trim(),
                     soDangKy: value.soDangKy,
+                    hoatChat: value.hoatChat,
+                    nongDo: value.nongDo,
+                    baoChe: value.baoChe,
+                    dongGoi: value.dongGoi,
+                    tuoiTho:value.tuoiTho,
+                    congTySx: value.congTySx,
+                    nuocSx: value.nuocSx,
+                    diaChiSx: value.diaChiSx,
+                    congTyDk: value.congTyDk,
+                    nuocDk: value.nuocDk,
+                    diaChiDk: value.diaChiDk,
+                    nhomThuoc: value.nhomThuoc,
                 }))
 
                 setDataSearch(() => listData.reduce((accumulator, currentValue : DataSearchDrug) => {
@@ -135,19 +159,12 @@ const AddForm = () : ComponentJSX => {
         }
     },[searchText])
 
-    useEffect(() => {
-        values.soDangKy = soDangKy;
-    },[soDangKy])
 
     useEffect(() => {
         if(barCode) {
             setFieldValue("MST", barCode);
         }
     },[barCode])
-
-    useEffect(() => {
-        setValues((data) => ({...data,...params})) 
-    },[params])
 
     return (
         <>
@@ -162,68 +179,177 @@ const AddForm = () : ComponentJSX => {
                     />
                 </View>
                 <KeyboardAwareScrollView  
+                    
+                    enableOnAndroid
                     style  = {{
                         backgroundColor: "white",
                         borderRadius: 10, 
                     }}
                 >
-                    <InputApp
-                        label= {ADD_FORM.label.MST}
-                        value= {values.MST}
-                        error= {errors.MST}
-                        maxLength= {ADD_FORM.maxLength.MST}
-                        inputMode= {ADD_FORM.inputMode.MST}
-                        placeholder= {ADD_FORM.placeholder.MST}   
-                        iconR= {ADD_FORM.iconRight.MST}
-                        iconL= {ADD_FORM.iconLeft.MST}
-                        handleChange= {handleChange("MST")}
-                        action={ACTION_MST}
-                    />
-                    <AutoDropdown
-                        label= {ADD_FORM.label.tenThuoc}
-                        searchText= {searchText}
-                        placeholder= {ADD_FORM.placeholder.tenThuoc}
-                        value= {values.tenThuoc}
-                        error= {errors.tenThuoc}
-                        data= {dataSearch}
-                        setData= {setDataSearch}
-                        iconL=  {ADD_FORM.iconLeft.tenThuoc}
-                        setSearchText= {setSearchText}
-                        handleChange= {handleChange("tenThuoc")}
-                        setSoDangKy= {setSoDangKy}
-                    />
-                    <InputApp
-                        label= {ADD_FORM.label.NSX}
-                        value= {values.NSX}
-                        error= {errors.NSX}
-                        edit= {false}
-                        inputMode= {ADD_FORM.inputMode.NSX}
-                        iconR= {ADD_FORM.iconRight.HSD}
-                        placeholder= {ADD_FORM.placeholder.NSX}
-                        handleChange= {handleChange("NSX")}
-                        action={ACTION_NSX}
-                    />
-                    <InputApp
-                        label= {ADD_FORM.label.HSD}
-                        value= {values.HSD}
-                        edit= {false}
-                        error= {errors.HSD}
-                        inputMode= {ADD_FORM.inputMode.HSD}
-                        iconR= {ADD_FORM.iconRight.HSD}
-                        placeholder= {ADD_FORM.placeholder.HSD}
-                        handleChange= {handleChange("HSD")}
-                        action={ACTION_HSD}
-                    />
-                    
-                    <InputChip
-                        label= {ADD_FORM.label.giaBan}
-                        listItem= {values.giaBan}
-                        error= {errors.giaBan}
-                        icon= {ADD_FORM.iconRight.giaBan}
-                        action= {ACTION_GIA_BAN }
-                        handlePress= {handlePressGiaBan}
-                        handleClose= {handleCloseGiaBan}
-                    />         
+                      <List.Section title="Thông tin thuốc">
+                        <List.Accordion
+                            title="Thông tin cơ bản"
+                            left={props => <List.Icon {...props} icon="pill" />}
+                            expanded = {expanded}
+                            onPress={() => {
+                                setExpanded(!expanded)
+                                if(expanded1)
+                                    setExpanded1(false);
+                                
+                            }}
+                        >
+                           <InputApp
+                                label= {ADD_FORM.label.MST}
+                                value= {values.MST}
+                                error= {errors.MST}
+                                maxLength= {ADD_FORM.maxLength.MST}
+                                inputMode= {ADD_FORM.inputMode.MST}
+                                placeholder= {ADD_FORM.placeholder.MST}   
+                                iconR= {ADD_FORM.iconRight.MST}
+                                iconL= {ADD_FORM.iconLeft.MST}
+                                handleChange= {handleChange("MST")}
+                                action={ACTION_MST}
+                            />
+                            <AutoDropdown
+                                label= {ADD_FORM.label.tenThuoc}
+                                searchText= {searchText}
+                                placeholder= {ADD_FORM.placeholder.tenThuoc}
+                                value= {values.tenThuoc}
+                                error= {errors.tenThuoc}
+                                data= {dataSearch}
+                                setData= {setDataSearch}
+                                iconL=  {ADD_FORM.iconLeft.tenThuoc}
+                                setSearchText= {setSearchText}
+                                handleChange= {handleChange("tenThuoc")}
+                                setValues= {setValues}
+                            />
+                            <InputApp
+                                label= {ADD_FORM.label.NSX}
+                                value= {values.NSX}
+                                error= {errors.NSX}
+                                edit= {false}
+                                inputMode= {ADD_FORM.inputMode.NSX}
+                                iconR= {ADD_FORM.iconRight.HSD}
+                                placeholder= {ADD_FORM.placeholder.NSX}
+                                handleChange= {handleChange("NSX")}
+                                action={ACTION_NSX}
+                            />
+                            <InputApp
+                                label= {ADD_FORM.label.HSD}
+                                value= {values.HSD}
+                                edit= {false}
+                                error= {errors.HSD}
+                                inputMode= {ADD_FORM.inputMode.HSD}
+                                iconR= {ADD_FORM.iconRight.HSD}
+                                placeholder= {ADD_FORM.placeholder.HSD}
+                                handleChange= {handleChange("HSD")}
+                                action={ACTION_HSD}
+                            />
+                            
+                            <InputChip
+                                label= {ADD_FORM.label.giaBan}
+                                listItem= {values.giaBan}
+                                error= {errors.giaBan}
+                                icon= {ADD_FORM.iconRight.giaBan}
+                                action= {ACTION_GIA_BAN }
+                                handlePress= {handlePressGiaBan}
+                                handleClose= {handleCloseGiaBan}
+                            />  
+                            <InputApp
+                                label= {ADD_FORM.label.huongDanSuDung}
+                                value= {values.huongDanSuDung}
+                                inputMode= {ADD_FORM.inputMode.huongDanSuDung}
+                                iconL= {ADD_FORM.iconLeft.huongDanSuDung}
+                                placeholder= {ADD_FORM.placeholder.huongDanSuDung}
+                                multiline= {true}
+                                handleChange= {handleChange("huongDanSuDung")}
+                            />       
+                        </List.Accordion>
+                        <List.Accordion
+                            title="Thông tin chi tiết"
+                            left={props => <List.Icon {...props} icon="information" />}
+                            expanded= {expanded1}
+                            onPress= {() => {
+                                if(expanded)
+                                    setExpanded(false);
+                                setExpanded1(!expanded1)
+                            }}
+
+                        >
+                            <InputApp
+                                edit= {false}
+                                label= {ADD_FORM.label.soDangKy}
+                                value= {values.soDangKy}
+                            />
+                            <InputApp
+                                edit= {false}
+                                label= {ADD_FORM.label.nhomThuoc}
+                                value= {values.nhomThuoc}
+                            />
+                            <InputApp
+                                edit= {false}
+                                label= {ADD_FORM.label.nongDo}
+                                value= {values.nongDo}
+                            />
+                            <InputApp
+                                edit= {false}
+                                label= {ADD_FORM.label.hoatChat}
+                                value= {values.hoatChat}
+                                multiline= {true}
+                            />
+                            <InputApp
+                                edit= {false}
+                                label= {ADD_FORM.label.baoChe}
+                                value= {values.baoChe}
+                            />
+                            <InputApp
+                                edit= {false}
+                                label= {ADD_FORM.label.nuocDk}
+                                value= {values.nuocDk}
+                                multiline= {true}
+                            />
+                            <InputApp
+                                edit= {false}
+                                label= {ADD_FORM.label.nuocSx}
+                                value= {values.nuocSx}
+                                multiline= {true}
+                            />
+                            <InputApp
+                                edit= {false}
+                                label= {ADD_FORM.label.congTyDk}
+                                value= {values.congTyDk}
+                                multiline= {true}
+                            />
+                            <InputApp
+                                edit= {false}
+                                label= {ADD_FORM.label.congTySx}
+                                value= {values.congTySx}
+                                multiline= {true}
+                            />
+                            <InputApp
+                                edit= {false}
+                                label= {ADD_FORM.label.diaChiDk}
+                                value= {values.diaChiDk}
+                                multiline= {true}
+                            />
+                            <InputApp
+                                edit= {false}
+                                label= {ADD_FORM.label.diaChiSx}
+                                value= {values.diaChiSx}
+                                multiline= {true}
+                            />
+                            <InputApp
+                                edit= {false}
+                                label= {ADD_FORM.label.dongGoi}
+                                value= {values.dongGoi}
+                            />
+                            <InputApp
+                                edit= {false}
+                                label= {ADD_FORM.label.tuoiTho}
+                                value= {values.tuoiTho}
+                            />
+                        </List.Accordion>
+                      </List.Section>    
                 </KeyboardAwareScrollView>      
             </View>
             <View style = {[styles.buttonContainer, {backgroundColor: theme.colors.mainColor}]}>
@@ -238,7 +364,7 @@ const AddForm = () : ComponentJSX => {
                 <Button
                     style= {{backgroundColor: 'white',}}
                     textColor= "black"
-                    name = "Thêm"
+                    name = {nameButton}
                     mode= "contained"
                     disabled= {Object.values(errors).some(text => text)}
                     handleClick={handleSubmit}
@@ -250,10 +376,14 @@ const AddForm = () : ComponentJSX => {
                 setVisible= {setOpenModalPrice}
                 children= {
                     <FormikApp
-                        initValue= {valuesPrice ?? PRICE_ADD_FORM.initValue}
+                        initValue= {formPrice}
                         enableReinitialize= {true}
                         validation= {schema}
-                        children= {<PriceFrom nameItem= {check}/>} 
+                        children= {
+                            <PriceFrom 
+                                {...layoutPrice}
+                            />
+                        } 
                         handleSubmit={(value : any) => handleSubmitGiaBan(value)}
                     />
                 }

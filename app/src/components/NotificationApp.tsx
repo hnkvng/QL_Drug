@@ -18,7 +18,7 @@ interface NotificationAppProps {
 const NotificationApp : ComponentProps<NotificationAppProps> = ({
     info,
     icon,
-    color,
+    color = 'black',
     loading = true,
     visible,
     setVisible
@@ -45,15 +45,15 @@ const NotificationApp : ComponentProps<NotificationAppProps> = ({
         >
             <View style = {{display: 'flex', flexDirection: "row"}}>
                 {!loading && <Icon 
-                    source= {icon} 
+                    source= {icon !== '' ? icon : undefined} 
                     size= {20} 
                     color= {color}
                 />}
                 {loading && <ActivityIndicator  
                     animating={true} 
-                    color= "black"
+                    color= {color}
                 />}
-                <Text style = {{marginLeft: 10}}>
+                <Text style = {{marginLeft: 10, color: color}}>
                     {info}
                 </Text>
             </View>

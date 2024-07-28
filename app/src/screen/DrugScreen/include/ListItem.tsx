@@ -205,11 +205,6 @@ const ListItem : ComponentProps<ListItemProps> = ({
         
     },[iconSortData])
 
-    const handleDetail = (name: string, soDangKy: string) => {
-        Linking.openURL(EXTERNAL_API_BASE_URLS.DRUG_BANK_URL + EXTERNAL_API_ENDPOINTS.DRUG_BANK.DETAIL_MEDICINE(name, soDangKy))
-    }
-
-    
     return (
         <Card style = {[styles.card,{backgroundColor: theme.colors.mainColor}]}>
             <Card.Title title= {title} titleStyle = {styles.title} right={data.length > 1 ? rightTitle : undefined}/>
@@ -241,7 +236,7 @@ const ListItem : ComponentProps<ListItemProps> = ({
                         </View>
                         <TouchableOpacity
                                 style = {styles.detail}
-                                onPress= {() => handleDetail(value.tenThuoc, value.soDangKy)}
+                                // onPress= {() => handleDetail(value.tenThuoc)}
                             >
                                 <Text 
                                     style = {{fontSize: 10, padding:1}}

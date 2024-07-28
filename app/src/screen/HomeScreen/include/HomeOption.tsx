@@ -30,7 +30,7 @@ const Options = () : React.JSX.Element => {
                 <View style = {styles.conSurface}>
                     <TouchableOpacity 
                         style={[styles.surface,{backgroundColor: theme.colors.mainColor}]} 
-                        onPress={() => navigation.navigate("addScreen")}
+                        onPress={() => navigation.navigate("addScreen",{title: 'Thêm thuốc', nameButton: 'Thêm'})}
                     >
                         <Icon name="plus" size={iconSize} />
                     </TouchableOpacity>

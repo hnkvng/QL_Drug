@@ -107,9 +107,6 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
-    debugImplementation "com.facebook.flipper:flipper:$FLIPPER_VERSION"
-    debugImplementation 'com.facebook.soloader:soloader:0.10.5'
-    releaseImplementation "com.facebook.flipper:flipper-noop:$FLIPPER_VERSION"
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-sqlite-storage')
     

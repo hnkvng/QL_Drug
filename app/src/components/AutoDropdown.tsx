@@ -6,6 +6,8 @@ import { ComponentJSX, ComponentProps } from '../services/type';
 import { HelperText } from 'react-native-paper';
 import { TextInput } from 'react-native-gesture-handler';
 import { theme } from '../services/theme';
+import { FormikErrors } from 'formik';
+import { FormDrug } from '../services/interface';
 
 interface AutoDropdownProps {
   label: string,
@@ -19,7 +21,7 @@ interface AutoDropdownProps {
   placeholder?: string,
   iconL: string,
   handleChange: (e: string | ChangeEvent<any>) => void,
-  setSoDangKy:  React.Dispatch<React.SetStateAction<string>>,
+  setValues: (values: React.SetStateAction<FormDrug>, shouldValidate?: boolean | undefined) => Promise<void | FormikErrors<FormDrug>>,
 }
 
 const AutoDropdown : ComponentProps<AutoDropdownProps> = ({
@@ -32,7 +34,7 @@ const AutoDropdown : ComponentProps<AutoDropdownProps> = ({
   placeholder,
   iconL,
   handleChange,
-  setSoDangKy,
+  setValues
   }) : ComponentJSX => {
   const [isFocus, setIsFocus] = useState(false);
 
@@ -54,6 +56,8 @@ const AutoDropdown : ComponentProps<AutoDropdownProps> = ({
   useEffect(() => {
     if(!value) {
       setData([])
+    } else {
+      setSearchText(value)
     }
   },[value, isFocus])
   return (
@@ -81,8 +85,23 @@ const AutoDropdown : ComponentProps<AutoDropdownProps> = ({
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
           onChange={item => {
-            handleChange(item.value);
-            setSoDangKy(item.soDangKy);
+            setValues((values) => ({
+              ...values,
+              tenThuoc: item.value,
+              soDangKy: item.soDangKy,
+              hoatChat: item.hoatChat,
+              nongDo: item.nongDo,
+              baoChe: item.baoChe,
+              dongGoi: item.dongGoi,
+              tuoiTho:item.tuoiTho,
+              congTySx: item.congTySx,
+              nuocSx: item.nuocSx,
+              diaChiSx: item.diaChiSx,
+              congTyDk: item.congTyDk,
+              nuocDk: item.nuocDk,
+              diaChiDk: item.diaChiDk,
+              nhomThuoc: item.nhomThuoc,
+            }))
           }}
           renderInputSearch={() => (
             <TextInput
@@ -103,8 +122,23 @@ const AutoDropdown : ComponentProps<AutoDropdownProps> = ({
                   name= "close"
                   size={20}
                   onPress={() => {
-                    handleChange("");
-                    setSoDangKy("");
+                    setValues((values) => ({
+                      ...values,
+                      tenThuoc: '',
+                      soDangKy: '',
+                      hoatChat:'',
+                      nongDo: '',
+                      baoChe: '',
+                      dongGoi: '',
+                      tuoiTho:'',
+                      congTySx: '',
+                      nuocSx: '',
+                      diaChiSx: '',
+                      congTyDk: '',
+                      nuocDk: '',
+                      diaChiDk: '',
+                      nhomThuoc: '',
+                    }))
                   }}
                 />
               )

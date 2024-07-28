@@ -18,10 +18,16 @@ const ImageDrug : ComponentProps<ImageDrugProps> = ({label, value, handleChange}
     return (
         <View style = {styles.container}>
             {value && <View style = {styles.conImg}>
-                        <Image
-                            style = {styles.img}
-                            source={{uri: value}}
-                        />
+                        <TouchableOpacity 
+                            onPress={() => {
+                                setShow(true);
+                            }}
+                        >
+                            <Image
+                                style = {styles.img}
+                                source={{uri: value}}
+                            />
+                        </TouchableOpacity>
                         <Icon 
                             name="close-circle-outline" 
                             size={25} 

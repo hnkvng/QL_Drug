@@ -25,7 +25,7 @@ const schema = Yup.object().shape({
             if(form.options.context) 
             if( value && 
                 form.options.context.NSX && 
-                (new Date(form.options.context.NSX) >= new Date(value))
+                (new Date(form.options.context.NSX) > new Date(value))
             ) {
                 return false;
             }
