@@ -9,7 +9,11 @@ interface ComboBoxProps {
     value? : string,
     placeholder : string, 
     style? : ViewStyle,
-    options: any,
+    options: {
+        label: string;
+        value: string | number;
+        custom?: React.ReactNode;
+    }[],
     handleChange : any, 
 }
 

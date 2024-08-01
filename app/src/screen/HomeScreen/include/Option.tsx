@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Title } from "react-native-paper";
+import { Title } from "react-native-paper";
 import { StyleSheet, View } from "react-native";
 import { Text } from 'react-native-paper';
 import { theme } from '../../../services/theme'
@@ -10,9 +10,9 @@ import { useNavigation } from "@react-navigation/native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 type PropsNavigation = StackNavigationProp<RootStackParamList,
-    | "searchScreen" 
-    | "addScreen" 
-    // | "trashScreen"
+    | "impactScreen"
+    | "addScreen"
+    | "sellScreen"
 >;
 
 const Options = () : React.JSX.Element => {
@@ -37,25 +37,22 @@ const Options = () : React.JSX.Element => {
                     <Text style = {{marginTop: 5}}>Thêm</Text>
                 </View>
                 <View style = {styles.conSurface}>
-                    <TouchableOpacity style={[styles.surface,{backgroundColor: theme.colors.mainColor}]}>
+                    <TouchableOpacity  
+                        style={[styles.surface,{backgroundColor: theme.colors.mainColor}]}
+                        onPress={() => navigation.navigate("impactScreen")}
+                    >
                         <Icon name="swap-horizontal" size={iconSize}/>
                     </TouchableOpacity >
-                    <Text style = {{marginTop: 5}}>Chỉnh sửa</Text>
-                </View>
-                <View style = {styles.conSurface}>
-                    <TouchableOpacity  style={[styles.surface,{backgroundColor: theme.colors.mainColor}]}>
-                        <Icon name="close-circle-outline" size={iconSize}/>
-                    </TouchableOpacity >
-                    <Text style = {{marginTop: 5}}>Xóa</Text>
+                    <Text style = {{marginTop: 5}}>Xóa/Thay đổi</Text>
                 </View>
                 <View style = {styles.conSurface}>
                     <TouchableOpacity  
                         style={[styles.surface,{backgroundColor: theme.colors.mainColor}]}
-                        onPress={() => navigation.navigate("searchScreen")}
+                        onPress={() => navigation.navigate("sellScreen")}
                     >
-                        <Icon name="text-box-search-outline" size={iconSize}/>
+                        <Icon name="cart-outline" size={iconSize}/>
                     </TouchableOpacity >
-                    <Text style = {{marginTop: 5}}>Tìm kiếm</Text>
+                    <Text style = {{marginTop: 5}}>Bán Thuốc</Text>
                 </View>
             </View> 
         </View>
@@ -66,6 +63,7 @@ const styles = StyleSheet.create({
     title: {
         fontWeight: '500',
         padding: 20,
+        paddingBottom: 0,
     },
     conSurface: {
         display: 'flex',

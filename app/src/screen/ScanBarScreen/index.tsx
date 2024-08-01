@@ -43,14 +43,13 @@ const ScanBarCodeScreen = () : React.JSX.Element => {
 
 
   const codeScanner = useCodeScanner({
-    codeTypes: ['qr', 'ean-13'],
+    codeTypes: ['ean-13'],
     onCodeScanned: (codes) => {
       if (enableOnCodeScanned) {
         const value = codes[0]?.value;
-        const type = codes[0]?.type;
         if(value) {
           dispatch(setCode(value))
-          navigation.goBack()
+          setTimeout(() => navigation.goBack(),500);
           setEnableOnCodeScanned(false);
         }
           
@@ -69,40 +68,6 @@ const ScanBarCodeScreen = () : React.JSX.Element => {
     }
   };
 
-  const showAlert = (
-    value = '',
-    countryOfOrigin = '',
-    showMoreBtn = true
-  ) => {
-    Alert.alert(
-      value,
-      countryOfOrigin,
-      showMoreBtn
-        ? [
-            {
-              text: 'Cancel',
-              onPress: () => console.log('Cancel Pressed'),
-              style: 'cancel',
-            },
-            {
-              text: 'More',
-              onPress: () => {
-                setTorchOn(false);
-                setEnableOnCodeScanned(true);
-              },
-            },
-          ]
-        : [
-            {
-              text: 'Cancel',
-              onPress: () => setEnableOnCodeScanned(true),
-              style: 'cancel',
-            },
-          ],
-      { cancelable: false }
-    );
-  };
-
   if (device == null)
     return (
       <View
@@ -112,7 +77,7 @@ const ScanBarCodeScreen = () : React.JSX.Element => {
       </View>
     );
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 , justifyContent: 'center', alignItems: 'center'}}>
       <Camera
         codeScanner={codeScanner}
         style={StyleSheet.absoluteFill}

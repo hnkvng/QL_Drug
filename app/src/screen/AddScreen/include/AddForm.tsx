@@ -1,5 +1,5 @@
 import { ADD_FORM, PRICE_ADD_FORM } from "../../../services/config";
-import { ComponentJSX, ComponentProps } from "../../../services/type";
+import { ComponentJSX, ComponentProps, PriceItem } from "../../../services/type";
 import ImageDrug from "./ImageDrug";
 import { StyleSheet, View } from "react-native";
 import { useFormikContext } from "formik";
@@ -24,6 +24,13 @@ import { EXTERNAL_API_BASE_URLS, EXTERNAL_API_ENDPOINTS } from "../../../service
 import { useSelector } from "react-redux";
 import { getCodeScanScreen } from "../../../redux/selection";
 import { List } from 'react-native-paper';
+import { createNumberMask } from "react-native-mask-input";
+
+
+const MSTMark = createNumberMask({
+    delimiter: '',
+    precision: 0,
+});
 
 type PropsNavigation = StackNavigationProp<RootStackParamList,
     'scanScreen'
@@ -34,7 +41,7 @@ interface AddFormProps {
 }
 
 const AddForm : ComponentProps<AddFormProps> = ({
-    nameButton
+    nameButton,
     }) : ComponentJSX => {
     const {
         values,
@@ -52,17 +59,19 @@ const AddForm : ComponentProps<AddFormProps> = ({
         nameButton: ''
     });
 
-    const [expanded, setExpanded] = useState(true);
-    const [expanded1, setExpanded1] = useState(false);
+    const [expandedBasic, setExpandedBasic] = useState(true);
+    const [expandedDetail, seteExpandedDetail] = useState(false);
     const [titleDate, setTitleDate] = useState('');
     const [openDate, setOpenDate] = useState(false);
     const [fieldDate, setFieldDate] = useState('');
     const [openModalPrice, setOpenModalPrice] = useState(false);
-    const [indexEdit, setIndexEdit] = useState(null);
+    const [indexEdit, setIndexEdit] = useState<number>(-1);
     const [searchText, setSearchText] = useState('');
-    const [dataSearch, setDataSearch] = useState([]);
+    const [dataSearch, setDataSearch] = useState<DataSearchDrug[]>([]);
     const [formPrice, setFormPrice] = useState<FormPrice>(PRICE_ADD_FORM.initValue);
+
     const barCode =  useSelector(getCodeScanScreen);
+
     const lengthGiaBan = useMemo(() => values.giaBan.length, [values.giaBan]);
     
     const ACTION_MST = useCallback(() => {
@@ -88,14 +97,14 @@ const AddForm : ComponentProps<AddFormProps> = ({
             donVi: '',
             soLuong: ''
         })
-        setIndexEdit(null);
+        setIndexEdit(-1);
         setLayoutPrice(() => ({
             title: `Cấp ${lengthGiaBan + 1}${lengthGiaBan == 0 ? "(Cấp cao nhất)": ""}`,
             nameButton: "Thêm",
         }))
     },[lengthGiaBan, values.giaBan]);
 
-    const handlePressGiaBan = useCallback((value : any, index : any) => {
+    const handlePressGiaBan = useCallback((value : FormPrice, index : number) => {
         setIndexEdit(index);
         setFormPrice(value);
         setOpenModalPrice(true);
@@ -103,7 +112,6 @@ const AddForm : ComponentProps<AddFormProps> = ({
             title: `Cấp ${index + 1}${index == 0 ? "(Cấp cao nhất)": ""}`,
             nameButton: "Thay đổi",
         }))
-        console.log(index)
     },[values.giaBan]);
 
     const handleCloseGiaBan = useCallback((value : any) => {
@@ -111,7 +119,7 @@ const AddForm : ComponentProps<AddFormProps> = ({
     },[values.giaBan]);
     
     const handleSubmitGiaBan = useCallback((value : any) => {
-        if(indexEdit !== null) {
+        if(indexEdit !== -1) {
             values.giaBan[indexEdit] = value
             setFieldValue('giaBan',[...values.giaBan]);              
         } else {
@@ -126,8 +134,9 @@ const AddForm : ComponentProps<AddFormProps> = ({
             api.get(EXTERNAL_API_ENDPOINTS.DRUG_BANK.SEARCH_MEDICINE(searchText))
             .then((data) => {
                 const listData : DataSearchDrug[] = data.map((value : any) => ({
-                    label: value.tenThuoc.toLowerCase().trim(), 
-                    value: value.tenThuoc.toLowerCase().trim(),
+                    label: `${value.tenThuoc.toLowerCase().trim()} - (SĐK: ${value.soDangKy})`,
+                    value: `${value.tenThuoc.toLowerCase().trim()} - (SĐK: ${value.soDangKy})`,
+                    tenThuoc: value.tenThuoc.toLowerCase().trim(),
                     soDangKy: value.soDangKy,
                     hoatChat: value.hoatChat,
                     nongDo: value.nongDo,
@@ -143,15 +152,7 @@ const AddForm : ComponentProps<AddFormProps> = ({
                     nhomThuoc: value.nhomThuoc,
                 }))
 
-                setDataSearch(() => listData.reduce((accumulator, currentValue : DataSearchDrug) => {
-                    if (accumulator.length > 0) {
-                        if(!accumulator.find((item : DataSearchDrug) => item.value == currentValue.value))
-                            accumulator.push(currentValue as never);
-                    } else {
-                        accumulator.push(currentValue as never);
-                    }
-                    return accumulator;
-                }, []))
+                setDataSearch(listData)
             })
             .catch((data) => {
                 console.log(data)
@@ -190,11 +191,11 @@ const AddForm : ComponentProps<AddFormProps> = ({
                         <List.Accordion
                             title="Thông tin cơ bản"
                             left={props => <List.Icon {...props} icon="pill" />}
-                            expanded = {expanded}
+                            expanded = {expandedBasic}
                             onPress={() => {
-                                setExpanded(!expanded)
-                                if(expanded1)
-                                    setExpanded1(false);
+                                setExpandedBasic(!expandedBasic)
+                                if(expandedDetail)
+                                    seteExpandedDetail(false);
                                 
                             }}
                         >
@@ -205,6 +206,7 @@ const AddForm : ComponentProps<AddFormProps> = ({
                                 maxLength= {ADD_FORM.maxLength.MST}
                                 inputMode= {ADD_FORM.inputMode.MST}
                                 placeholder= {ADD_FORM.placeholder.MST}   
+                                mark= {MSTMark}
                                 iconR= {ADD_FORM.iconRight.MST}
                                 iconL= {ADD_FORM.iconLeft.MST}
                                 handleChange= {handleChange("MST")}
@@ -215,6 +217,7 @@ const AddForm : ComponentProps<AddFormProps> = ({
                                 searchText= {searchText}
                                 placeholder= {ADD_FORM.placeholder.tenThuoc}
                                 value= {values.tenThuoc}
+                                soDangKy= {values.soDangKy}
                                 error= {errors.tenThuoc}
                                 data= {dataSearch}
                                 setData= {setDataSearch}
@@ -268,11 +271,11 @@ const AddForm : ComponentProps<AddFormProps> = ({
                         <List.Accordion
                             title="Thông tin chi tiết"
                             left={props => <List.Icon {...props} icon="information" />}
-                            expanded= {expanded1}
+                            expanded = {expandedDetail}
                             onPress= {() => {
-                                if(expanded)
-                                    setExpanded(false);
-                                setExpanded1(!expanded1)
+                                if(expandedBasic)
+                                    setExpandedBasic(false);
+                                seteExpandedDetail(!expandedDetail)
                             }}
 
                         >
@@ -342,6 +345,7 @@ const AddForm : ComponentProps<AddFormProps> = ({
                                 edit= {false}
                                 label= {ADD_FORM.label.dongGoi}
                                 value= {values.dongGoi}
+                                multiline= {true}
                             />
                             <InputApp
                                 edit= {false}

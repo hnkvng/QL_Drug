@@ -7,10 +7,14 @@ export type EventCHangeHandler = React.ChangeEventHandler<HTMLInputElement>;
 export type EventChangeType = React.ChangeEvent<HTMLInputElement>;
 export type EventClickType =  React.MouseEvent<HTMLDivElement, MouseEvent>;
 export type rootReducer = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
 export type InputModeType = "none" | "decimal" | "email" | "numeric" | "search" | "tel" | "text" | "url";
 export type TableName = "Drug" | "Price";
 export type sortData = "ASC" | "DESC";
 export type propsNameIcon = 'sort-ascending' | 'sort-descending';
+export type detailScreenParam = {
+    id: number;
+}
 export type addScreenParam =  {
     MST?: number,
     title: string,
@@ -46,6 +50,8 @@ export type DrugDetailItem = {
     nhomThuoc: string,
 }
 
-export type Error = {
+export type Mesage = {
+    icon: string,
+    color: string,
     message: string
 }

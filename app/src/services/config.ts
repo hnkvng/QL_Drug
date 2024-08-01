@@ -45,6 +45,15 @@ export const DATABASE = {
                 'trongSo',
                 'Drug_Id',
             ]
+        },
+        Storage: {
+            name: 'Storage',
+            column: [
+                'id',
+                'donViCoBan',
+                'soLuong',
+                'Drug_Id'
+            ]
         }
     }
 }
@@ -168,10 +177,60 @@ export const STATUS = {
     }
 }
 
-export const LIST_DATA = {
-    title: {
-        list1: 'Danh sách thuốc còn hạn',
-        list2: 'Danh sách thuốc gần hết hạn',
-        list3: 'Danh sách thuốc đã hết hạn',
+export const MESSAGE = {
+    default: {
+        icon: undefined,
+        color: 'black'
+    },
+    addInfoDrug: {
+        loading: 'Đang thêm thuốc',
+        susscess: {
+            ...STATUS.susscess,
+            message: 'Thêm thuốc thành công'
+        },
+        warning: {
+            sameId: {
+                ...STATUS.warning,
+                message: 'Mã số thuốc đã tồn tại',
+            },
+            sameDrug: {
+                ...STATUS.warning,
+                message: 'Thuốc đã tồn tại',
+            }
+        },
+    },
+    updateInfoDrug: {
+        loading: 'Đang thay đổi thuốc',
+        susscess: {
+            ...STATUS.susscess,
+            message: 'Thây đổi thuốc thành công'
+        },
+        warning: {
+            sameId: {
+                ...STATUS.warning,
+                message: 'Mã số thuốc đã tồn tại',
+            },
+            sameDrug: {
+                ...STATUS.warning,
+                message: 'Thuốc đã tồn tại',
+            }
+        },
+    },
+    deleteDrug: {
+        loading: 'Đang xóa thuốc',
+        susscess: {
+            ...STATUS.susscess,
+            message: 'Xóa thuốc thành công'
+        },
+        warning: {
+            notId: {
+                ...STATUS.warning,
+                message: 'Mã số thuốc không tồn tại',
+            },
+        },
+    },
+    error: {
+        ...STATUS.error,
+        message: 'lỗi hệ thống, vui lòng liên hệ nhà phát triển!'
     }
 }

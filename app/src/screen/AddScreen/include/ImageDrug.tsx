@@ -12,7 +12,14 @@ interface  ImageDrugProps {
     handleChange: any,
 }
 
-const ImageDrug : ComponentProps<ImageDrugProps> = ({label, value, handleChange}) : React.JSX.Element => {
+const ImageDrug : ComponentProps<ImageDrugProps> = (
+    {
+        label, 
+        value, 
+        handleChange,
+    }
+    ) : React.JSX.Element => {
+
     const [show, setShow] = useState(false);
 
     return (

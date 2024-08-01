@@ -32,3 +32,4 @@ export interface DataSearchDrug {
     value: string,
     soDangKy: string,
 }
+

@@ -5,17 +5,25 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { Provider as StoreProvider } from 'react-redux';
 import store from './app/src/redux/store';
 import {RootStackParamList} from './app/src/services/stackNavigate'
-import Layout from './app/layout';
 import { ComponentJSX } from './app/src/services/type';
 import { theme } from './app/src/services/theme';
 import { PaperProvider } from 'react-native-paper';
+import Notification from './app/src/componentsSpecial/Notification';
+
+import HomeScreen from './app/src/screen/HomeScreen';
 
 const AddScreen = lazy(() =>  import( './app/src/screen/AddScreen'));
 const ScanBarCodeScreen = lazy(() => import( './app/src/screen/ScanBarScreen'));
-const SearchScreen = lazy(() => import('./app/src/screen/SearchScreen'));
+const ImpactDrugScreen = lazy(() => import('./app/src/screen/ImpactDrugScreen'));
+const SellScreen = lazy(() => import('./app/src/screen/SellScreen'));
+const DrugScreen = lazy(() => import('./app/src/screen/DrugScreen'));
+const DetailScreen = lazy(() => import('./app/src/screen/DetailScreen'));
 // import { deleteDB, getDBConnection, getDrugItems } from './app/database/db-service';
 
 import { deleteDB } from './app/src/services/db';
+
+
+
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -37,7 +45,7 @@ const App = () : ComponentJSX => {
       <PaperProvider theme={theme}>
           <NavigationContainer>
             <Stack.Navigator 
-              initialRouteName='layout'
+              initialRouteName='homeScreen'
               screenOptions={{
                 gestureDirection: 'horizontal',
                 cardStyleInterpolator: ({ current, next, layouts }) => {
@@ -53,15 +61,19 @@ const App = () : ComponentJSX => {
                       ],
                     },
                   };
-                },
+                }, 
               }}
             >
-              <Stack.Screen options={{headerShown:false}} name='layout' component={Layout}/>
+              <Stack.Screen options={{headerShown: false}} name='homeScreen' component={HomeScreen}/>
               <Stack.Screen options={{title: 'Thêm thuốc', headerShown: false}} name='addScreen' component={AddScreen}/>
-              <Stack.Screen options={{title: 'Tìm kiếm thuốc'}} name='searchScreen' component={SearchScreen}/>
+              <Stack.Screen options={{title: 'Xóa/Thay đổi'}} name='impactScreen' component={ImpactDrugScreen}/>
+              <Stack.Screen options={{title: 'Bán Thuốc'}} name='sellScreen' component={SellScreen}/>
+              <Stack.Screen options={{title: 'Thuốc'}} name='drugScreen' component={DrugScreen}/>
+              <Stack.Screen options={{title: 'Chi tiết'}} name='detailScreen' component={DetailScreen}/>
               <Stack.Screen options={{title: 'Scan'}} name='scanScreen' component={ScanBarCodeScreen}/>
             </Stack.Navigator>
           </NavigationContainer>
+          <Notification/>
       </PaperProvider>
     </StoreProvider>
   );

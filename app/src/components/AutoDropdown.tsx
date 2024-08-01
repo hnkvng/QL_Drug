@@ -13,6 +13,7 @@ interface AutoDropdownProps {
   label: string,
   value?: string,
   values?: any,
+  soDangKy?: string,
   error?: string,
   searchText: string,
   setSearchText: any,
@@ -28,15 +29,16 @@ const AutoDropdown : ComponentProps<AutoDropdownProps> = ({
   label,
   data,
   setData,
+  soDangKy,
   value,
   error,
   setSearchText,
   placeholder,
   iconL,
-  handleChange,
   setValues
   }) : ComponentJSX => {
   const [isFocus, setIsFocus] = useState(false);
+  const [text, setText] = useState(value ? `${value} - (SĐK: ${soDangKy})`: '');
 
   const renderLabel = () => {
     if (value || isFocus) {
@@ -60,6 +62,7 @@ const AutoDropdown : ComponentProps<AutoDropdownProps> = ({
       setSearchText(value)
     }
   },[value, isFocus])
+
   return (
     <>
       <View style={styles.container}>
@@ -70,6 +73,7 @@ const AutoDropdown : ComponentProps<AutoDropdownProps> = ({
             error ? { borderColor: 'red', borderWidth: 2} 
             : isFocus && { borderColor: theme.colors.mainColor }
           ]}
+          selectedTextProps={{numberOfLines: 1}}
           placeholderStyle={[styles.placeholderStyle, error ? {color: 'red'} : {}]}
           selectedTextStyle={styles.selectedTextStyle}
           inputSearchStyle={styles.inputSearchStyle}
@@ -81,26 +85,18 @@ const AutoDropdown : ComponentProps<AutoDropdownProps> = ({
           valueField="value"
           placeholder={!isFocus ? label : placeholder}
           searchPlaceholder="Search..."
-          value={value}
+          value={text}
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
           onChange={item => {
+            const changeItem = {...item}
+            setText(item.label);
+            delete changeItem.label;
+            
             setValues((values) => ({
               ...values,
-              tenThuoc: item.value,
-              soDangKy: item.soDangKy,
-              hoatChat: item.hoatChat,
-              nongDo: item.nongDo,
-              baoChe: item.baoChe,
-              dongGoi: item.dongGoi,
-              tuoiTho:item.tuoiTho,
-              congTySx: item.congTySx,
-              nuocSx: item.nuocSx,
-              diaChiSx: item.diaChiSx,
-              congTyDk: item.congTyDk,
-              nuocDk: item.nuocDk,
-              diaChiDk: item.diaChiDk,
-              nhomThuoc: item.nhomThuoc,
+              ...changeItem,
+              
             }))
           }}
           renderInputSearch={() => (
@@ -122,6 +118,7 @@ const AutoDropdown : ComponentProps<AutoDropdownProps> = ({
                   name= "close"
                   size={20}
                   onPress={() => {
+                    setText('');
                     setValues((values) => ({
                       ...values,
                       tenThuoc: '',
@@ -195,7 +192,6 @@ const styles = StyleSheet.create({
   },
   selectedTextStyle: {
     fontSize: 16,
-    
     color: 'black'
   },
   iconStyle: {
@@ -203,6 +199,8 @@ const styles = StyleSheet.create({
     height: 20,
   },
   inputSearchStyle: {
+    padding: 10,
+    borderWidth: 0.2,
     height: 40,
     color: 'black',
     fontSize: 16,

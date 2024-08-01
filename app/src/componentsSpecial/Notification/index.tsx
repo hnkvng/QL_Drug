@@ -1,51 +1,49 @@
 import { useEffect, memo} from "react";
-import { ComponentJSX, ComponentProps} from "../services/type";
+import { ComponentJSX } from "../../services/type";
 import { ActivityIndicator, Snackbar, Text } from 'react-native-paper';
-import { IconSource } from "react-native-paper/lib/typescript/components/Icon";
 import { Icon } from 'react-native-paper';
 import { View } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { getNotifi } from "../../redux/selection";
+import NotifiSlice from "./slice";
 
 
-interface NotificationAppProps {
-    info: string,
-    icon?: IconSource,
-    color?: string, 
-    loading?: boolean,
-    visible: boolean,
-    setVisible: any,
-}
+const NotificationApp = () : ComponentJSX=> {
 
-const NotificationApp : ComponentProps<NotificationAppProps> = ({
-    info,
-    icon,
-    color = 'black',
-    loading = true,
-    visible,
-    setVisible
-    }) : ComponentJSX=> {
+    const dispatch = useDispatch();
+    const {show, loading, icon, color, message} = useSelector(getNotifi);
+    const reset = NotifiSlice.actions.reset;
+    const setShow = NotifiSlice.actions.setShow;
 
-    const onDismissSnackBar = () => setVisible(false);
+    const handleDismiss = () => {
+        dispatch(setShow(false))
+    }
 
     useEffect(() => {
-        if(loading && !visible) {
-            setVisible(true)
+        if(loading && !show) {
+            dispatch(setShow(true))
         }
-    },[visible])
+    },[loading])
+
+    useEffect(() =>{ 
+        if(!show)
+            dispatch(reset())
+    },[show]) 
  
     return (
         <Snackbar
-            visible= {visible}
-            onDismiss={onDismissSnackBar}
+            visible= {show}
+            onDismiss={handleDismiss}
             action={{
                 label: 'Ẩn',
                 textColor: 'black',
-                onPress: onDismissSnackBar,
+                onPress: handleDismiss,
             }}
             style = {{backgroundColor: "white"}}
         >
             <View style = {{display: 'flex', flexDirection: "row"}}>
                 {!loading && <Icon 
-                    source= {icon !== '' ? icon : undefined} 
+                    source= {icon} 
                     size= {20} 
                     color= {color}
                 />}
@@ -54,7 +52,7 @@ const NotificationApp : ComponentProps<NotificationAppProps> = ({
                     color= {color}
                 />}
                 <Text style = {{marginLeft: 10, color: color}}>
-                    {info}
+                    {message}
                 </Text>
             </View>
             

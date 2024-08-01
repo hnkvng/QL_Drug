@@ -20,7 +20,6 @@ const vndMark = createNumberMask({
     separator: '',
     precision: 0,
 })
-  
 
 const PriceForm : ComponentProps<PriceFormProps> = ({
     title,

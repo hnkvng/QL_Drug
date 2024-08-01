@@ -1,8 +1,9 @@
 import {deleteDatabase, enablePromise, openDatabase, SQLiteDatabase, Transaction} from 'react-native-sqlite-storage';
-import {FormDrug } from './interface';
+import {FormDrug, FormPrice } from './interface';
 import {DrugItem, TableName} from './type';
-import { DATABASE } from './config';
+import { DATABASE, MESSAGE } from './config';
 import uuid from 'uuid-random';
+import { Alert } from 'react-native';
 
 const Drug = {
   name: 'Drug',
@@ -220,14 +221,6 @@ export class Database {
     return this.createTransaction(trigger);
   }
 
-  dropTrigger(name: string) {
-    const query = 
-    `
-      DROP TRIGGER ${name}
-    `
-    return this.createTransaction(query);
-  }
-
   async addInfoDrug(FormAdd: FormDrug) {
     const {
       avatar,
@@ -251,9 +244,27 @@ export class Database {
       diaChiDk,
       nhomThuoc,
     } = FormAdd;
-  
-    const priceId = uuid();
+
+    const querySameId = `SELECT id FROM ${DATABASE.table.Drug.name} WHERE id = ${MST};`
+    const querySameSDK = `SELECT soDangKy FROM ${DATABASE.table.DrugDetail.name} WHERE soDangKy = '${soDangKy}';`
+
+    const sameId : any = await this.createTransaction(querySameId);
+    const sameSDK : any = await this.createTransaction(querySameSDK);
+
+    if(sameId.rows.length) {
+      throw MESSAGE.addInfoDrug.warning.sameId;
+    }
+    else if(sameSDK.rows.length) {
+      throw MESSAGE.addInfoDrug.warning.sameDrug;
+    }
+
     const drugDetailId = uuid();
+    const storageId = uuid();
+    const donViBasic = giaBan[giaBan.length - 1].donVi;
+    const soLuongStorage = giaBan.reduce((sum, item) => {
+      sum *= parseInt(item.soLuong);
+      return sum;
+    }, 1)
 
     const transInsertDrug = 
     `
@@ -263,9 +274,12 @@ export class Database {
     const transInsertPrice = 
     `
       INSERT INTO ${DATABASE.table.Price.name} (${DATABASE.table.Price.column.join(',')})
-      VALUES ${giaBan.map((value, index) => 
-        `('${priceId}', '${value.giaBan}', '${value.donVi}' ,${value.soLuong}, ${index+1}, ${MST})`).join(',')};
+      VALUES ${giaBan.map((value, index) => {
+        let priceId = uuid();
+        return `('${priceId}', '${value.giaBan}', '${value.donVi}' ,${value.soLuong}, ${index+1}, ${MST})`
+      }).join(',\n')};
     `
+
     const transInsertDrugDetail = 
     `
       INSERT INTO ${DATABASE.table.DrugDetail.name} (${DATABASE.table.DrugDetail.column.join(',')})
@@ -288,40 +302,204 @@ export class Database {
         ${MST}
       );
     `
+
+    const transStorage = 
+    `
+      INSERT INTO ${DATABASE.table.Storage.name} (${DATABASE.table.Storage.column.join(',')})
+      VALUES (
+        '${storageId}',
+        '${donViBasic}',
+        ${soLuongStorage},
+        ${MST}
+      );
+    `
     const query = 
     `
         ${transInsertPrice}
         ${transInsertDrugDetail}
+        ${transStorage}
     `
 
     const nameTrigger = 'addInfoDrug';
 
     try {
-      await this.createTrigger('addInfoDrug', 'AFTER', 'INSERT', DATABASE.table.Drug.name, query);
-      return await this.createTransaction(transInsertDrug,`DROP TRIGGER ${nameTrigger}`)
+      await this.createTrigger(nameTrigger, 'AFTER', 'INSERT', DATABASE.table.Drug.name, query);
+      await this.createTransaction(transInsertDrug,`DROP TRIGGER ${nameTrigger}`);
+      return MESSAGE.addInfoDrug.susscess;
     }
-    catch (error) {
-      return {message: error}
+    catch (error : any) {
+      throw MESSAGE.error;
     }
     
   }
 
-  getItemDrug(condition?: string) {
-    const query = `SELECT id, tenThuoc FROM ${DATABASE.table.Drug.name} ${condition}`
+  async updateInfoDrug(id: number, soDangKyInit: string, giaBanInit: FormPrice[], FormAdd: FormDrug) {
+    const {
+      avatar,
+      MST, 
+      tenThuoc, 
+      NSX, 
+      HSD, 
+      giaBan,
+      huongDanSuDung,
+      soDangKy,
+      hoatChat,
+      nongDo,
+      baoChe,
+      dongGoi,
+      tuoiTho,
+      congTySx,
+      nuocSx,
+      diaChiSx,
+      congTyDk,
+      nuocDk,
+      diaChiDk,
+      nhomThuoc,
+    } = FormAdd;
+    
+    if(id !== parseInt(MST)) {
+      const querySameId = `SELECT id FROM ${DATABASE.table.Drug.name} WHERE id = ${MST};`
+      const sameId : any = await this.createTransaction(querySameId);
+      if(sameId.rows.length) {
+        throw MESSAGE.updateInfoDrug.warning.sameId;
+      }
+    } 
+    if(soDangKy !== soDangKyInit) {
+      const querySameSDK = `SELECT soDangKy FROM ${DATABASE.table.DrugDetail.name} WHERE soDangKy = '${soDangKy}';`
+      const sameSDK : any = await this.createTransaction(querySameSDK);
+      if(sameSDK.rows.length) {
+        throw MESSAGE.updateInfoDrug.warning.sameDrug;
+      }
+    }
+
+    const donViBasic = giaBan[giaBan.length - 1].donVi;
+    const soLuongStorage = giaBan.reduce((sum, item) => {
+      sum *= parseInt(item.soLuong);
+      return sum;
+    }, 1)
+    
+    const transChangeDrug = 
+    `
+      UPDATE ${DATABASE.table.Drug.name}
+      SET id = ${MST},
+          avatar = '${avatar}',
+          tenThuoc = '${tenThuoc}',
+          NSX = '${NSX}',
+          HSD = '${HSD}'
+      WHERE id = ${id};
+    `
+
+    let transChangePrice = '';
+
+    for(let index = 0; index < giaBanInit.length; index++) {
+      transChangePrice += 
+      `
+        UPDATE ${DATABASE.table.Price.name}
+        SET giaBan = '${giaBan[index].giaBan}',
+            donVi = '${giaBan[index].donVi}',
+            soLuong = ${giaBan[index].soLuong},
+            Drug_Id = ${MST}
+        WHERE Drug_Id = ${id} AND trongSo = ${index + 1};
+      `
+    }
+
+    if(giaBan.length < giaBanInit.length) {
+      const start = giaBanInit.length;
+      const end = giaBan.length;
+      for(let index = start; index > end; index--) {
+        transChangePrice += 
+        `
+          DELETE FROM ${DATABASE.table.Price.name}
+          WHERE Drug_Id = ${id} AND trongSo = ${index};
+        `
+      }
+    } 
+    if (giaBan.length > giaBanInit.length) {
+      const start = giaBanInit.length;
+      const end = giaBan.length;
+      for(let index = start; index < end; index++) {
+        let priceId = uuid();
+        transChangePrice += 
+        `
+          INSERT INTO ${DATABASE.table.Price.name} (${DATABASE.table.Price.column.join(',')})
+          VALUES (
+            '${priceId}', 
+            '${giaBan[index].giaBan}', 
+            '${giaBan[index].donVi}', 
+            ${giaBan[index].soLuong}, 
+            ${index + 1}, 
+            ${MST}
+          );
+        `
+      }
+    }
+    
+    const transChangeDrugDetail = 
+    `
+      UPDATE ${DATABASE.table.DrugDetail.name}
+      SET huongDanSuDung = '${huongDanSuDung}',
+          soDangKy = '${soDangKy}',
+          hoatChat = '${hoatChat}',
+          nongDo = '${nongDo}',
+          baoChe = '${baoChe}',
+          dongGoi = '${dongGoi}',
+          tuoiTho = '${tuoiTho}',
+          congTySx = '${congTySx}',
+          nuocSx = '${nuocSx}',
+          diaChiSx = '${diaChiSx}',
+          congTyDk = '${congTyDk}',
+          nuocDk = '${nuocDk}',
+          diaChiDk = '${diaChiDk}',
+          nhomThuoc = '${nhomThuoc}',
+          Drug_Id = ${MST}
+      WHERE Drug_Id = ${id};
+    `
+
+    const transStorage = 
+    `
+      UPDATE ${DATABASE.table.Storage.name}
+      SET donViCoBan = '${donViBasic}',
+          soLuong = ${soLuongStorage},
+          Drug_Id = ${MST}
+      WHERE Drug_Id = ${id};
+    `
+
+    const query = 
+    `
+      ${transChangePrice}
+      ${transChangeDrugDetail}
+      ${transStorage}
+    `
+    
+    const nameTrigger = 'changeInfoDrug';
+
+    
+    try {
+      await this.createTrigger(nameTrigger, 'AFTER', 'UPDATE', DATABASE.table.Drug.name, query);
+      await this.createTransaction(transChangeDrug,`DROP TRIGGER ${nameTrigger}`)
+      return MESSAGE.updateInfoDrug.susscess;
+    }
+    catch (error : any) {
+      throw MESSAGE.error;
+    }
+  }
+
+  getItemDrug(selectColumn: string[], condition?: string) {
+    const query = `SELECT ${selectColumn.join(',')} FROM ${DATABASE.table.Drug.name} ${condition}`
     return this.createTransaction(query);
   }
 
-  getItemDrugDetail(condition?: string) {
-    const query = `SELECT * FROM ${DATABASE.table.DrugDetail.name} ${condition}`
+  getItemDrugDetail(selectColumn: string[], condition?: string) {
+    const query = `SELECT ${selectColumn} FROM ${DATABASE.table.DrugDetail.name} ${condition}`
     return this.createTransaction(query);
   }
 
-  getIemPrice(condition?: string) {
-    const query = `SELECT * FROM ${DATABASE.table.Price.name} ${condition}`
+  getIemPrice(selectColumn: string[], condition?: string) {
+    const query = `SELECT ${selectColumn.join(',')} FROM ${DATABASE.table.Price.name} ${condition}`
     return this.createTransaction(query);
   }
 
-  getDetail(id: number) {
+  getDetail(condition: string) {
     const listColumn = [
       'D.id',
       'avatar',
@@ -342,14 +520,9 @@ export class Database {
       'nuocDk',
       'diaChiDk',
       'nhomThuoc',
-      'giaBan',
-      'donVi',
-      'soLuong',
-      'trongSo',
     ]
     const nameDrug = DATABASE.table.Drug.name;
     const nameDrugDetail = DATABASE.table.DrugDetail.name;
-    const namePrice = DATABASE.table.Price.name;
 
     const query = 
     `
@@ -358,12 +531,54 @@ export class Database {
       FROM ${nameDrug} as D
       JOIN ${nameDrugDetail} as DT
       ON D.id = DT.Drug_Id
-      JOIN ${namePrice} as P
-      ON D.id = P.Drug_Id
-      WHERE D.id = ${id}
+      ${condition}
       ;
     `
     return this.createTransaction(query);
+  }
+
+  getStorage(selectColumn: string[], condition?: string) {
+    const query = `SELECT ${selectColumn.join(',')} FROM ${DATABASE.table.Storage.name} ${condition}`
+    return this.createTransaction(query);
+  }
+
+  dropTrigger(name: string) {
+    const query = 
+    `
+      DROP TRIGGER ${name}
+    `
+    return this.createTransaction(query);
+  }
+
+  async deleteItemDrug(id: number) {
+
+    const searchDrug : any = await this.getItemDrug(['id'], `WHERE id = ${id}`);
+
+    if(!searchDrug.rows.length) {
+      throw MESSAGE.deleteDrug.warning.notId;
+    }
+
+    const nameTrigger = 'deleteItemDrug'
+    const tranDeleteDrug = 
+    `
+      DELETE FROM ${DATABASE.table.Drug.name} WHERE id = ${id};
+    `
+    const query = 
+    `
+      DELETE FROM ${DATABASE.table.Price.name} WHERE Drug_Id = ${id};
+      DELETE FROM ${DATABASE.table.DrugDetail.name} WHERE Drug_Id = ${id};
+      DELETE FROM ${DATABASE.table.Storage.name} WHERE Drug_Id = ${id};
+    `
+
+    try {
+      await this.createTrigger(nameTrigger, 'AFTER', 'DELETE', DATABASE.table.Drug.name, query);
+      await this.createTransaction(tranDeleteDrug,`DROP TRIGGER ${nameTrigger}`)
+      return MESSAGE.deleteDrug.susscess;
+    }
+    catch (error : any) {
+      Alert.alert(error);
+      throw MESSAGE.error;
+    }
   }
 }
 

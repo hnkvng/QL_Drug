@@ -1,13 +1,8 @@
 import * as Yup from 'yup';
 import findDuplicateUnits from '../../utils/sameUnit';
-// import moment from 'moment';
-
-
-const regexMST = /[0-9]+$/
 
 const schema = Yup.object().shape({
     MST: Yup.string()
-        .matches(regexMST,"Mã số không hợp lệ")
         .min(13, 'Mã số sản phẩm phải có 13 chữ số')
         .required('Không được để trống!'),
     tenThuoc: Yup.string()
@@ -25,7 +20,7 @@ const schema = Yup.object().shape({
             if(form.options.context) 
             if( value && 
                 form.options.context.NSX && 
-                (new Date(form.options.context.NSX) > new Date(value))
+                (new Date(form.options.context.NSX) >= new Date(value))
             ) {
                 return false;
             }

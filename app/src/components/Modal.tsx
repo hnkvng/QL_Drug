@@ -1,6 +1,6 @@
-import { Modal, Portal, Text } from "react-native-paper"
+import { Modal, Portal } from "react-native-paper"
 import { ComponentJSX, ComponentProps } from "../services/type"
-import { StyleProp, StyleSheet, ViewStyle } from "react-native"
+import { StyleProp, ViewStyle } from "react-native"
 import { memo } from "react"
 
 interface ModalAppProps {

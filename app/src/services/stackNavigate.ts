@@ -1,11 +1,14 @@
 import { StackScreenProps } from "@react-navigation/stack";
-import { addScreenParam } from "./type";
+import { addScreenParam, detailScreenParam } from "./type";
 
 export type RootStackParamList = {
-    layout: undefined,
+    homeScreen: undefined,
     addScreen: addScreenParam,
     scanScreen: undefined,
-    searchScreen: undefined,
+    impactScreen: undefined,
+    drugScreen: undefined,
+    detailScreen: detailScreenParam,
+    sellScreen: undefined,
 };
 
 export type  addScreenParamProp = StackScreenProps<RootStackParamList,'addScreen'>

@@ -48,7 +48,7 @@ const InputChip : ComponentProps<InputChipProps> = ({
                     /> : null
                 }
                 render={() => listItem.length > 0 &&
-                    listItem.map((value: FormPrice, index : any) => 
+                    listItem.map((value: FormPrice, index : number) => 
                         <TouchableOpacity
                             key={index}
                             style = {styles.chip}
