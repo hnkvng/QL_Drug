@@ -3,19 +3,14 @@ import { rootReducer } from "../services/type";
 import MenuSelectSlice from "../screen/DrugScreen/include/MenuSelect/slice";
 
 export const getCodeScanScreen = (state: rootReducer) => state.scanScreen.code;
-export const getCheckAll = (state: rootReducer) => state.drugScreen.menuSelectSlice.checkAll;
-export const getCheckNotExpired = (state: rootReducer) => state.drugScreen.menuSelectSlice.checkNotExpired;
-export const getCheckNearExpired = (state: rootReducer) => state.drugScreen.menuSelectSlice.checkNearExpired;
-export const getCheckExpired = (state: rootReducer) => state.drugScreen.menuSelectSlice.checkExpired;
+export const getMenu = (state: rootReducer) => state.drugScreen.menuSelectSlice;
 export const getSearch = (state: rootReducer) => state.drugScreen.searchDrugSlice.search;
 export const getNotifi = (state: rootReducer) => state.componentSpecial.notifi;
+export const getCart = (state: rootReducer) => state.componentSpecial.cart;
  
 export const listCheckBoxChip = createSelector(
-    getCheckAll, 
-    getCheckNotExpired,
-    getCheckNearExpired,
-    getCheckExpired,
-    (checkAll, checkNotExpired, checkNearExpired, checkExpired) => {
+    getMenu,
+    ({checkAll, checkNotExpired, checkNearExpired, checkExpired}) => {
         const setCheckAll = MenuSelectSlice.actions.setCheckAll;
         const setCheckNearExpired = MenuSelectSlice.actions.setCheckNearExpired;
         const setCheckNotExpired = MenuSelectSlice.actions.setCheckNotExpired;
@@ -61,11 +56,8 @@ export const listCheckBoxChip = createSelector(
 
 export const querySearchDrug = createSelector(
     getSearch,
-    getCheckAll, 
-    getCheckNotExpired,
-    getCheckNearExpired,
-    getCheckExpired,
-    (search, checkAll, checkNotExpired, checkNearExpired, checkExpired) => {
+    getMenu,
+    (search,{checkAll, checkNotExpired, checkNearExpired, checkExpired}) => {
         const query = [`tenThuoc LIKE '%${search}%'`];
         const listQuery = [
             "HSD > DATE('now', '+30 days')",
@@ -88,5 +80,15 @@ export const querySearchDrug = createSelector(
             else
                 return `WHERE tenThuoc LIKE ''`
         }
+    }
+)
+
+export const mathSumPrice =  createSelector(
+    getCart,
+    ({listItem}) => {
+        return listItem.reduce((sum, item) => {
+            sum += parseInt(item.giaBan.replace('.','')) * item.soLuong;
+            return sum
+        },0)
     }
 )

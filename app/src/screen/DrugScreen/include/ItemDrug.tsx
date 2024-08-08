@@ -1,42 +1,33 @@
 import { Card, Text } from "react-native-paper";
 import { ComponentJSX, ComponentProps } from "../../../services/type";
-import { Touchable, TouchableNativeFeedback, View } from "react-native";
+import { TouchableNativeFeedback, View } from "react-native";
 import { Image } from "react-native";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../../../services/stackNavigate";
+import { PropsNavigation } from "../../../services/stackNavigate";
 import { useNavigation } from "@react-navigation/native";
-import { theme } from "../../../services/theme";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import Button from "../../../components/Button";
-
-type PropsNavigation = StackNavigationProp<RootStackParamList,
-    'detailScreen'
->;
+import { memo } from "react";
+import { DATA } from "./ListDrug";
 
 interface ItemDrugProps {
-    id: number,
-    avatar: string,
-    tenThuoc: string,
-    soDangKy: string,
-    NSX: string,
-    HSD: string, 
+    item: DATA,
 }
 
-const ItemDrug : ComponentProps<ItemDrugProps> = (
-    {
-        id,
+const ItemDrug : ComponentProps<ItemDrugProps> = ({
+    item,
+}) : ComponentJSX => {
+    const {
+        MST,
         avatar,
         tenThuoc,
         soDangKy,
         NSX,
-        HSD
-    }
-) : ComponentJSX => {
+        HSD 
+    } = item;
+    
     const navigation = useNavigation<PropsNavigation>();
 
     return (
         <TouchableNativeFeedback
-            onPress={() => navigation.navigate('detailScreen', {id: id})}
+            onPress={() => navigation.navigate('detailScreen', {MST: MST})}
         >
         <Card style = {{ height: 100, margin: 10}}>
             <View style = {{height: "100%", display: 'flex', flexDirection: 'row', alignItems:'center'}}>
@@ -46,7 +37,7 @@ const ItemDrug : ComponentProps<ItemDrugProps> = (
                             { uri: avatar } 
                             : require('../../../assets/imageDrug.jpg')
                         }
-                        style = {{width: 80, height: 80, borderRadius: 10}}
+                        style = {{width: 80, objectFit: 'cover', height: 80, borderRadius: 10}}
                     />
                 </View>
                 <View>
@@ -66,4 +57,4 @@ const ItemDrug : ComponentProps<ItemDrugProps> = (
     )
 }
 
-export default ItemDrug;
+export default memo(ItemDrug);

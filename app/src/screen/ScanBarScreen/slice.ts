@@ -1,16 +1,18 @@
-import { Action, PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
+interface scanScreenSlice {
+    code: string,
+}
 
-const INITSTATE = {
+const INITIALSTATE : scanScreenSlice = {
     code: "",
 }
 
-
 const scanScreenSlice = createSlice({
     name: "scanScreen",
-    initialState: INITSTATE,
+    initialState: INITIALSTATE,
     reducers: {
-        reset: () => INITSTATE,
+        reset: () => INITIALSTATE,
         setCode: (state, action : PayloadAction<string>) => {
             state.code = action.payload;
         }

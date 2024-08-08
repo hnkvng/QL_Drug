@@ -1,29 +1,39 @@
 import { useDispatch, useSelector } from "react-redux"
 import { ComponentJSX, ComponentProps } from "../../../../services/type"
-import { getSearch } from "../../../../redux/selection";
+import { getCodeScanScreen, getSearch } from "../../../../redux/selection";
 import Search from "../../../../components/Search";
-import SearchSlice from "./slice";
+import searchSlice from "./slice";
+import { memo, useEffect } from "react";
+import { useNavigation } from "@react-navigation/native";
+import { PropsNavigation } from "../../../../services/stackNavigate";
 
 interface SearchDrugProps {
-    setVisible: (x : boolean) => void,
+    setVisible: (show : boolean) => void,
 }
 
 const SearchDrug : ComponentProps<SearchDrugProps> = ({
     setVisible
 }) : ComponentJSX => {
 
+    const navigation = useNavigation<PropsNavigation>();
     const dispatch = useDispatch();
-
     const searchQuery = useSelector(getSearch);
+    const barcode = useSelector(getCodeScanScreen);
+    const setSearchQuery = searchSlice.actions.setSearch;
     
-    const setSearchQuery = SearchSlice.actions.setSearch;
-    
+    useEffect(() => {
+        if(barcode) {
+            setTimeout(() => navigation.navigate('detailScreen', {MST: parseInt(barcode)}),500)
+        }
+    },[barcode])
     return (
         <Search
             value= {searchQuery}
             setValue={(value : string) => dispatch(setSearchQuery(value))}
+            iconRight= 'barcode-scan'
+            handleIconRight={() => navigation.navigate('scanScreen')}
             handleIconSearch={() => setVisible(true)}
         />
     )
 }
-export default SearchDrug;
+export default memo(SearchDrug);

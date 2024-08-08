@@ -1,8 +1,16 @@
 import * as Yup from 'yup';
 import findDuplicateUnits from '../../utils/sameUnit';
+import { isValidEAN } from '../../utils/testBarcode';
 
 const schema = Yup.object().shape({
     MST: Yup.string()
+        .test('barcodeIvalid', 'Barcode không hợp lệ', (value) => {
+            if(value)
+            if(isValidEAN(value)) {
+                return true;
+            }
+            return false;
+        })
         .min(13, 'Mã số sản phẩm phải có 13 chữ số')
         .required('Không được để trống!'),
     tenThuoc: Yup.string()

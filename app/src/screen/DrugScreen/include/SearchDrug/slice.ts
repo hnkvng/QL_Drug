@@ -8,8 +8,7 @@ const INITIALSTATE : SearchSlice = {
     search: ''
 }
 
-
-const SearchDrugSlice = createSlice({
+const searchDrugSlice = createSlice({
     name: 'searchDrug',
     initialState: INITIALSTATE,
     reducers: {
@@ -20,4 +19,4 @@ const SearchDrugSlice = createSlice({
     }
 })
 
-export default SearchDrugSlice;
+export default searchDrugSlice;

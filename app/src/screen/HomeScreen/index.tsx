@@ -5,14 +5,19 @@ import { ComponentJSX } from "../../services/type";
 import Header from "./include/Header";
 import { ScrollView } from "react-native-gesture-handler";
 import ProductList from "./include/ProductList";
+import Chart from "./include/Chart";
+import { useEffect } from "react";
 
 const HomeScreen = () : ComponentJSX => {
     return (
         <SafeAreaView style = {styles.container}>
             <Header/>
-            <ScrollView style = {{flex: 1, width: "100%"}}>
-                <Options/>
-                <ProductList/>
+            <ScrollView>
+                <SafeAreaView style = {{flex: 1}}>
+                    <Chart/>
+                    <Options/>
+                    <ProductList/>
+                </SafeAreaView>
             </ScrollView>
         </SafeAreaView>   
     );

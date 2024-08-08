@@ -1,10 +1,13 @@
-import React, { useState } from "react";
-import { Image, StyleSheet, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Image, Linking, StyleSheet, View } from "react-native";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Text } from 'react-native-paper';
 import { TouchableOpacity } from "react-native-gesture-handler";
-import ChooseImg from "../../../components/ChooseImg";
-import { ComponentProps } from "../../../services/type";
+import ChooseImg from "./ChooseImg";
+import { ComponentProps } from "../services/type";
+import { useCameraPermission } from "react-native-vision-camera";
+import { useDispatch } from "react-redux";
+import notifiSlice from "../componentsSpecial/Notification/slice";
 
 interface  ImageDrugProps {
     label: string,
@@ -20,7 +23,26 @@ const ImageDrug : ComponentProps<ImageDrugProps> = (
     }
     ) : React.JSX.Element => {
 
+    const dispatch = useDispatch();
     const [show, setShow] = useState(false);
+    const handleWarn = notifiSlice.actions.handleWarn;
+
+    const {
+        requestPermission: requestCameraPermission,
+    } = useCameraPermission();
+
+    const handleCameraPermission = async () => {
+        const granted = await requestCameraPermission();
+    
+        if (!granted) {
+          dispatch(handleWarn(`Cần có sự cho phép của máy ảnh để sử dụng máy ảnh. Vui lòng cấp quyền trong cài đặt thiết bị của bạn`));
+          Linking.openSettings();
+        }
+    };
+    
+    useEffect(() => {
+        handleCameraPermission()
+    },[])
 
     return (
         <View style = {styles.container}>

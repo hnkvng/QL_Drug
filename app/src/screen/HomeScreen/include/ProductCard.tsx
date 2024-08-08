@@ -1,47 +1,35 @@
 import { View } from "react-native"
 import { ComponentJSX, ComponentProps } from "../../../services/type"
-import { Card, Text, Title } from "react-native-paper"
-import { useState, memo } from "react"
+import { Card, Text } from "react-native-paper"
+import { useState, memo, useCallback } from "react"
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler"
 import { StyleSheet } from "react-native"
 import { theme } from "../../../services/theme"
 import Button from "../../../components/Button"
-import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
-import { RootStackParamList } from "../../../services/stackNavigate"
-
-
-type PropsNavigation = StackNavigationProp<RootStackParamList,
-    'detailScreen'
->;
+import { PropsNavigation } from "../../../services/stackNavigate"
+import { DATA } from "./ProductList"
 
 interface ProductCardProps {
-    id: number,
-    avatar: string,
-    tenThuoc: string,
-    soDangKy: string,
-    dongGoi: string,
-    giaBan: {
-        giaBan: string,
-        donVi: string
-    }[],
+    item: DATA,
+    navigation: PropsNavigation,
 }
-
-const ProductCard : ComponentProps<ProductCardProps> = (
-    {
-        id,
+const ProductCard : ComponentProps<ProductCardProps> = ({item, navigation}) : ComponentJSX => {
+    
+    const { 
+        MST,
         avatar,
         tenThuoc,
         soDangKy,
         giaBan,
-        dongGoi,
-    }
-    ) : ComponentJSX => {
+        dongGoi
+    } = item
 
-    const navigation = useNavigation<PropsNavigation>();
-    const [selecDonVi, setSelectDonVi] = useState(0);
-    const [focus, setFocus] = useState(giaBan.map((_,index) => index === 0 ? true: false));
+    const [index, setIndex] = useState(0);
 
+    const handleButton = useCallback(() => {
+        navigation.navigate('detailScreen', {MST: MST})
+    },[MST])
+    
     return (
         <Card style = {{width: 200, margin: 10}}>
             <Card.Cover 
@@ -66,28 +54,26 @@ const ProductCard : ComponentProps<ProductCardProps> = (
                             }
                         }
                     >
-                        {giaBan.map((item, index) => 
+                        {giaBan.map((item, i) => {
+                            const active = i === index;
+                            return (
                                 <TouchableOpacity 
-                                        key= {index}
+                                        key= {i}
                                         style = {
                                             [
                                                 styles.itemDoVi, 
-                                                focus[index] ? {
+                                                active ? {
                                                     borderWidth: 1,
                                                     borderColor: theme.colors.mainColor
                                                 } : {}
                                             ]} 
-                                        onPress={() => {
-                                            setSelectDonVi(index)
-                                            setFocus(() => focus.map((_, indexs) => 
-                                                indexs === index ? true: false))
-                                        }}
+                                        onPress={() => setIndex(i)}
                                     >
                                     <Text 
                                         style = {
                                             [
                                                 {textAlign: 'center'},
-                                                focus[index] ? {color: theme.colors.mainColor}
+                                                active ? {color: theme.colors.mainColor}
                                                 : {}
                                             ]
                                         }
@@ -96,7 +82,7 @@ const ProductCard : ComponentProps<ProductCardProps> = (
                                     </Text>
                                 </TouchableOpacity>
                             )
-                        }
+                        })}
                     </View>
                 </ScrollView>
                 <ScrollView horizontal>
@@ -109,7 +95,7 @@ const ProductCard : ComponentProps<ProductCardProps> = (
                             }
                         }
                     >
-                        {giaBan[selecDonVi].giaBan}
+                        {giaBan[index].giaBan}
                     </Text>
                     <Text 
                         style = {
@@ -119,41 +105,20 @@ const ProductCard : ComponentProps<ProductCardProps> = (
                             }
                         }
                     >
-                        ₫/{giaBan[selecDonVi].donVi}
+                        ₫/{giaBan[index].donVi}
                     </Text>
                 </ScrollView>
                 <ScrollView horizontal>
-                    <Text 
-                        style = {
-                            {
-                                display: 'flex', 
-                                marginTop: 10, 
-                                padding: 5,
-                                backgroundColor: '#edf0f3', 
-                                borderRadius: 10
-                            }
-                        }
-                        >
-                            {dongGoi}
-                        </Text>
+                    <Text style = {styles.textDongGoi}> {dongGoi}</Text>
                 </ScrollView>
             </Card.Content>
-            <View 
-                style = {
-                    {
-                        display:'flex', 
-                        justifyContent: 'center', 
-                        padding: 10, 
-                        paddingTop: 5
-                    }
-                }
-            >
+            <View style = {styles.containerButton}>
                 <Button
                     style= {{backgroundColor: 'grey', margin: 5}}
                     mode= "contained"
                     name="Xem chi tiết"
                     textColor= "white" 
-                    handleClick={() => navigation.navigate('detailScreen', {id: id})} 
+                    handleClick={handleButton} 
                 />
             </View>
         </Card>
@@ -174,6 +139,19 @@ const styles = StyleSheet.create({
         borderWidth: 0.2,
         borderColor: '#e5e7eb',
         borderRadius: 10,
+    },
+    containerButton: {
+        display:'flex', 
+        justifyContent: 'center', 
+        padding: 10, 
+        paddingTop: 5
+    },
+    textDongGoi: {
+        display: 'flex', 
+        marginTop: 10, 
+        padding: 5,
+        backgroundColor: '#edf0f3', 
+        borderRadius: 10
     },
     itemDoVi: {
         margin: 5, 

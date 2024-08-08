@@ -14,7 +14,7 @@ const INITIALSTATE : MenuSelectSlice = {
     checkExpired: true,
 }
 
-const MenuSelectSlice = createSlice({
+const menuSelectSlice = createSlice({
     name: 'menuSelect',
     initialState: INITIALSTATE,
     reducers: {
@@ -47,4 +47,4 @@ const MenuSelectSlice = createSlice({
     }
 })
 
-export default MenuSelectSlice;
+export default menuSelectSlice;

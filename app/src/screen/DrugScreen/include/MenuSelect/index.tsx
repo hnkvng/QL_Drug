@@ -1,10 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, memo } from "react";
 import { ComponentJSX, ComponentProps } from "../../../../services/type";
 import { Checkbox, Title } from 'react-native-paper';
 import Modal from "../../../../components/Modal";
 import { useDispatch, useSelector } from "react-redux";
-import { getCheckAll, getCheckExpired, getCheckNearExpired, getCheckNotExpired } from "../../../../redux/selection";
-import MenuSelectSlice from "./slice";
+import { getMenu } from "../../../../redux/selection";
+import menuSelectSlice from "./slice";
 import { View } from "react-native";
 
 interface MenuSelectProps {
@@ -18,18 +18,18 @@ const MenuSelect : ComponentProps<MenuSelectProps> = ({
     }) : ComponentJSX | boolean => {
     const dispatch = useDispatch();
 
-    const menu = {
-        checkAll: useSelector(getCheckAll),
-        checkNearExpired: useSelector(getCheckNearExpired),
-        checkNotExpired: useSelector(getCheckNotExpired),
-        checkExpired: useSelector(getCheckExpired)
-    }
+    const {
+        checkAll,
+        checkNearExpired,
+        checkNotExpired,
+        checkExpired
+    } = useSelector(getMenu);
 
-    const reset = MenuSelectSlice.actions.reset;
-    const setCheckAll = MenuSelectSlice.actions.setCheckAll;
-    const setCheckNearExpired = MenuSelectSlice.actions.setCheckNearExpired;
-    const setCheckNotExpired = MenuSelectSlice.actions.setCheckNotExpired;
-    const setCheckExpired = MenuSelectSlice.actions.setCheckExpired;
+    const reset = menuSelectSlice.actions.reset;
+    const setCheckAll = menuSelectSlice.actions.setCheckAll;
+    const setCheckNearExpired = menuSelectSlice.actions.setCheckNearExpired;
+    const setCheckNotExpired = menuSelectSlice.actions.setCheckNotExpired;
+    const setCheckExpired = menuSelectSlice.actions.setCheckExpired;
 
     useEffect(() => {
         return () => {
@@ -56,22 +56,22 @@ const MenuSelect : ComponentProps<MenuSelectProps> = ({
                     <Title>Tìm theo hạn sử dụng</Title>
                     <Checkbox.Item 
                         label="Tất cả" 
-                        status= {menu.checkAll ? "checked": 'unchecked'} 
+                        status= {checkAll ? "checked": 'unchecked'} 
                         onPress={() => dispatch(setCheckAll())}
                     />
                     <Checkbox.Item 
                         label="Thuốc còn hạn"  
-                        status= {menu.checkNotExpired ? "checked": 'unchecked'}  
+                        status= {checkNotExpired ? "checked": 'unchecked'}  
                         onPress={() => dispatch(setCheckNotExpired())}
                     />
                     <Checkbox.Item 
                         label="Thuốc gần hết hạn"  
-                        status= {menu.checkNearExpired ? "checked": 'unchecked'} 
+                        status= {checkNearExpired ? "checked": 'unchecked'} 
                         onPress={() => dispatch(setCheckNearExpired())}
                     />
                     <Checkbox.Item 
                         label="Thuốc gần đã hết hết hạn"  
-                        status= {menu.checkExpired ? "checked": 'unchecked'} 
+                        status= {checkExpired ? "checked": 'unchecked'} 
                         onPress={() => dispatch(setCheckExpired())}
                     />
                 </View>
@@ -83,4 +83,4 @@ const MenuSelect : ComponentProps<MenuSelectProps> = ({
     )
 }
 
-export default MenuSelect;
+export default memo(MenuSelect);

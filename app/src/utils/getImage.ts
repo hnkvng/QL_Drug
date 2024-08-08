@@ -3,6 +3,7 @@ import { launchImageLibrary , launchCamera} from 'react-native-image-picker';
 type typImgRq = typeof launchCamera | typeof launchImageLibrary;
 
 async function handleImg (handleMethod : typImgRq) {
+    
     const result = await handleMethod({
         mediaType: 'photo',
         quality: 1,

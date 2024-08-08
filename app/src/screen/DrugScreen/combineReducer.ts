@@ -1,11 +1,11 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import MenuSelectSlice from "./include/MenuSelect/slice";
-import SearchDrugSlice from "./include/SearchDrug/slice";
+import menuSelectSlice from "./include/MenuSelect/slice";
+import searchDrugSlice from "./include/SearchDrug/slice";
 
 
 const drugScreenReducer = combineReducers({
-    menuSelectSlice: MenuSelectSlice.reducer,
-    searchDrugSlice: SearchDrugSlice.reducer,
+    menuSelectSlice: menuSelectSlice.reducer,
+    searchDrugSlice: searchDrugSlice.reducer,
 })
 
 export default drugScreenReducer;

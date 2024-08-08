@@ -3,7 +3,7 @@ import { Image, StyleSheet, View } from "react-native";
 import { ComponentJSX } from "../../../services/type";
 import { Text } from "react-native-paper";
 import { theme } from "../../../services/theme";
-
+import { memo } from "react";
 
 const Header = () : ComponentJSX => {
     return (
@@ -17,7 +17,7 @@ const Header = () : ComponentJSX => {
                 <View style = {{paddingRight: 10}}>
                     <Image 
                         style = {styles.avatar} 
-                        source={require('../../../assets/doctor.jpg')}
+                        source={require('../../../assets/Y_si.png')}
                     />
                 </View>
                 <View>
@@ -54,7 +54,8 @@ const styles = StyleSheet.create({
         width: 45, 
         height: 45,
         borderRadius: 99,
+        backgroundColor: 'white'
     }
 })
 
-export default Header;
+export default memo(Header);

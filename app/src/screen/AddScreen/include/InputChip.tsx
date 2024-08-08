@@ -2,12 +2,11 @@ import React, {memo} from "react";
 import { StyleSheet } from "react-native";
 import { Chip,HelperText, IconButton, Text } from 'react-native-paper';
 import { View } from "react-native";
-import { ComponentJSX, ComponentProps } from "../services/type";
+import { ComponentJSX, ComponentProps } from "../../../services/type";
 import { TextInput, Icon} from "react-native-paper";
-import { FormPrice } from "../services/interface";
+import { FormPrice } from "../../../services/interface";
 import { IconSource } from "react-native-paper/lib/typescript/components/Icon";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import IconButtonApp from "./IconButtonApp";
 
 interface InputChipProps {
     listItem: FormPrice[],
@@ -55,7 +54,7 @@ const InputChip : ComponentProps<InputChipProps> = ({
                             onPress= {() => handlePress(value, index)}
                         >
                             <View style = {{padding: 10,}}>
-                                <Icon source= "cash-multiple" size={20} color="green"/>
+                                <Icon source= {icon} size={20} color="green"/>
                             </View>
                             <View 
                                 style = {{
@@ -85,59 +84,19 @@ const InputChip : ComponentProps<InputChipProps> = ({
                                     numberOfLines={1} 
                                     ellipsizeMode="tail"
                                 >
-                                    Số lượng: {value.soLuong}
+                                    Quy cách: {value.quyCach}
                                 </Text>
                             </View>
                             <View style = {{margin:10}}>
-                                <IconButtonApp 
+                                <IconButton
                                     icon= "close" 
-                                    size={20} 
-                                    color="black" 
-                                    handleClick={() => handleClose(value)}
+                                    iconColor= "black"
+                                    size={20}  
+                                    onPress={() => handleClose(value)}
                                 />
                             </View>
                         </TouchableOpacity>
-                        // <Chip 
-                        //     key={index}
-                        //     textStyle={styles.chip}
-                        //     style ={{width: "80%", margin: 10}} 
-                        //     icon= {icon} 
-                        //     onPress= {() => handlePress(value, index)}
-                        //     onClose={() => handleClose(value)}
-                        // >
-                        //     <View 
-                        //         style = {{
-                        //             display: 'flex', 
-                        //             justifyContent: 'center', 
-                        //             backgroundColor:'center',
-                        //             width: "100%", 
-                        //             height: "100%"
-                        //         }}
-                        //     >
-                        //         <Text
-                        //             style = {{width: "100%"}}
-                        //             numberOfLines={1} 
-                        //             ellipsizeMode="tail"
-                        //         >
-                        //             Giá: {value.giaBan}₫
-                        //         </Text>
-                        //         <Text
-                        //             style = {{width: "100%"}}
-                        //             numberOfLines={1} 
-                        //             ellipsizeMode="tail"
-                        //         >
-                        //             Đơn vị: {value.donVi}
-                        //         </Text>
-                        //         <Text
-                        //             style = {{width: "100%"}}
-                        //             numberOfLines={1} 
-                        //             ellipsizeMode="tail"
-                        //         >
-                        //             Số lượng: {value.soLuong}
-                        //         </Text>
-                        //     </View>
-                           
-                        // </Chip>
+
                 )}
             >
             </TextInput>

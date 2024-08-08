@@ -1,48 +1,33 @@
 import { ADD_FORM, PRICE_ADD_FORM } from "../../../services/config";
-import { ComponentJSX, ComponentProps, PriceItem } from "../../../services/type";
-import ImageDrug from "./ImageDrug";
+import { ComponentJSX } from "../../../services/type";
+import ImageDrug from "../../../components/ImageDrug";
 import { StyleSheet, View } from "react-native";
 import { useFormikContext } from "formik";
 import { DataSearchDrug, FormDrug, FormPrice } from "../../../services/interface";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import DatePicker from "../../../components/DatePicker";
-import { useState, memo, useCallback, useMemo, useEffect, useLayoutEffect } from "react";
-import InputChip from "../../../components/InputChip";
+import { useState, memo, useCallback, useMemo, useEffect } from "react";
+import InputChip from "./InputChip";
 import ModalApp from "../../../components/Modal";
 import FormikApp from "../../../components/FormikApp";
 import schema from "../validationPriceForm";
 import PriceFrom from "./PriceForm";
 import Button from "../../../components/Button";
 import { theme } from "../../../services/theme";
-import { StackNavigationProp } from "@react-navigation/stack";
-import {  RootStackParamList } from "../../../services/stackNavigate";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import InputApp from "../../../components/InputApp";
-import AutoDropdown from "../../../components/AutoDropdown";
+import AutoDropdown from "./AutoDropdown";
 import FetchApi from "../../../utils/fetchApi";
 import { EXTERNAL_API_BASE_URLS, EXTERNAL_API_ENDPOINTS } from "../../../services/api";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getCodeScanScreen } from "../../../redux/selection";
 import { List } from 'react-native-paper';
-import { createNumberMask } from "react-native-mask-input";
+import { numberMark } from "../../../services/config";
+import notifiSlice from "../../../componentsSpecial/Notification/slice";
+import {useNetInfo} from "@react-native-community/netinfo";
+import { PropsNavigation } from "../../../services/stackNavigate";
 
-
-const MSTMark = createNumberMask({
-    delimiter: '',
-    precision: 0,
-});
-
-type PropsNavigation = StackNavigationProp<RootStackParamList,
-    'scanScreen'
->;
-
-interface AddFormProps {
-    nameButton: string,
-}
-
-const AddForm : ComponentProps<AddFormProps> = ({
-    nameButton,
-    }) : ComponentJSX => {
+const AddForm = () : ComponentJSX => {
     const {
         values,
         errors,
@@ -52,11 +37,19 @@ const AddForm : ComponentProps<AddFormProps> = ({
         setValues,
     } = useFormikContext<FormDrug>();
 
-    const navigation = useNavigation<PropsNavigation>();
+    const dispatch = useDispatch();
 
-    const [layoutPrice, setLayoutPrice] = useState({
+    const navigation = useNavigation<PropsNavigation>();
+    const netInfo = useNetInfo();
+
+    const [layoutPrice, setLayoutPrice] = useState<{
+        title: string,
+        nameButton: string,
+        valueDefault: string,
+    }>({
         title: '',
-        nameButton: ''
+        nameButton: '',
+        valueDefault: ''
     });
 
     const [expandedBasic, setExpandedBasic] = useState(true);
@@ -70,10 +63,13 @@ const AddForm : ComponentProps<AddFormProps> = ({
     const [dataSearch, setDataSearch] = useState<DataSearchDrug[]>([]);
     const [formPrice, setFormPrice] = useState<FormPrice>(PRICE_ADD_FORM.initValue);
 
+
     const barCode =  useSelector(getCodeScanScreen);
+    const handleError = notifiSlice.actions.handleError;
+   
 
     const lengthGiaBan = useMemo(() => values.giaBan.length, [values.giaBan]);
-    
+
     const ACTION_MST = useCallback(() => {
         navigation.navigate('scanScreen')
     },[]);
@@ -95,12 +91,13 @@ const AddForm : ComponentProps<AddFormProps> = ({
         setFormPrice({
             giaBan: '',
             donVi: '',
-            soLuong: ''
+            quyCach: ''
         })
         setIndexEdit(-1);
         setLayoutPrice(() => ({
             title: `Cấp ${lengthGiaBan + 1}${lengthGiaBan == 0 ? "(Cấp cao nhất)": ""}`,
             nameButton: "Thêm",
+            valueDefault: lengthGiaBan === 0 ? '1': '',
         }))
     },[lengthGiaBan, values.giaBan]);
 
@@ -111,6 +108,7 @@ const AddForm : ComponentProps<AddFormProps> = ({
         setLayoutPrice(() => ({
             title: `Cấp ${index + 1}${index == 0 ? "(Cấp cao nhất)": ""}`,
             nameButton: "Thay đổi",
+            valueDefault: index === 0 ? '1': '',
         }))
     },[values.giaBan]);
 
@@ -129,7 +127,7 @@ const AddForm : ComponentProps<AddFormProps> = ({
     },[values.giaBan, indexEdit]);
 
     useEffect(() => {
-        if(searchText) {
+        if(searchText && netInfo.isConnected) {
             const api = new FetchApi(EXTERNAL_API_BASE_URLS.DRUG_BANK_API);
             api.get(EXTERNAL_API_ENDPOINTS.DRUG_BANK.SEARCH_MEDICINE(searchText))
             .then((data) => {
@@ -154,12 +152,11 @@ const AddForm : ComponentProps<AddFormProps> = ({
 
                 setDataSearch(listData)
             })
-            .catch((data) => {
-                console.log(data)
+            .catch(() => {
+                dispatch(handleError());
             })
         }
     },[searchText])
-
 
     useEffect(() => {
         if(barCode) {
@@ -206,7 +203,7 @@ const AddForm : ComponentProps<AddFormProps> = ({
                                 maxLength= {ADD_FORM.maxLength.MST}
                                 inputMode= {ADD_FORM.inputMode.MST}
                                 placeholder= {ADD_FORM.placeholder.MST}   
-                                mark= {MSTMark}
+                                mark= {numberMark}
                                 iconR= {ADD_FORM.iconRight.MST}
                                 iconL= {ADD_FORM.iconLeft.MST}
                                 handleChange= {handleChange("MST")}
@@ -231,7 +228,6 @@ const AddForm : ComponentProps<AddFormProps> = ({
                                 value= {values.NSX}
                                 error= {errors.NSX}
                                 edit= {false}
-                                inputMode= {ADD_FORM.inputMode.NSX}
                                 iconR= {ADD_FORM.iconRight.HSD}
                                 placeholder= {ADD_FORM.placeholder.NSX}
                                 handleChange= {handleChange("NSX")}
@@ -242,7 +238,6 @@ const AddForm : ComponentProps<AddFormProps> = ({
                                 value= {values.HSD}
                                 edit= {false}
                                 error= {errors.HSD}
-                                inputMode= {ADD_FORM.inputMode.HSD}
                                 iconR= {ADD_FORM.iconRight.HSD}
                                 placeholder= {ADD_FORM.placeholder.HSD}
                                 handleChange= {handleChange("HSD")}
@@ -368,7 +363,7 @@ const AddForm : ComponentProps<AddFormProps> = ({
                 <Button
                     style= {{backgroundColor: 'white',}}
                     textColor= "black"
-                    name = {nameButton}
+                    name = "Thêm"
                     mode= "contained"
                     disabled= {Object.values(errors).some(text => text)}
                     handleClick={handleSubmit}

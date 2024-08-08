@@ -24,8 +24,14 @@ export interface FormDrug {
 export interface FormPrice {
     giaBan: string,
     donVi: string,
-    soLuong: string,
+    quyCach: string,
 };
+
+export interface FormAddOrReduce {
+    soLuong: string,
+    donVi: string,
+    themBot: string,
+}
 
 export interface DataSearchDrug {
     label: string,

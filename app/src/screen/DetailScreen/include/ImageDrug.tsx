@@ -1,6 +1,7 @@
 import { Image } from "react-native";
 import { ComponentJSX, ComponentProps } from "../../../services/type";
 import { View } from "react-native";
+import { memo } from "react";
 
 interface ImageDrugProps {
     avatar?: string,
@@ -17,6 +18,7 @@ const ImageDrug : ComponentProps<ImageDrugProps> = ({
                     style = {{
                         width: 200,
                         height: 200, 
+                        objectFit: 'contain',
                         borderBottomRightRadius: 10, 
                         borderBottomLeftRadius: 10,
                     }}
@@ -29,4 +31,4 @@ const ImageDrug : ComponentProps<ImageDrugProps> = ({
     )
 }
 
-export default ImageDrug;
+export default memo(ImageDrug);

@@ -12,23 +12,29 @@ export type InputModeType = "none" | "decimal" | "email" | "numeric" | "search" 
 export type TableName = "Drug" | "Price";
 export type sortData = "ASC" | "DESC";
 export type propsNameIcon = 'sort-ascending' | 'sort-descending';
+
 export type detailScreenParam = {
-    id: number;
+    MST: number,
 }
-export type addScreenParam =  {
-    MST?: number,
-    title: string,
-    nameButton: "Thêm" | "Thay đổi"
-};
+
+export type updateScreenParam = {
+    MST: number,
+}
+
+export type addOrReduceScreenParam = {
+    MST: number,
+}
+
 export type PriceItem = {
     giaBan: string,
     donVi: string,
     soLuong: number,
 };
+
 export type DrugItem = {
+    MST: number,
     avatar: string,
-    MST: number;
-    tenThuoc: string;
+    tenThuoc: string,
     NSX: string,
     HSD: string,
 };
@@ -48,10 +54,10 @@ export type DrugDetailItem = {
     nuocDk: string,
     diaChiDk: string,
     nhomThuoc: string,
-}
+};
 
 export type Mesage = {
     icon: string,
     color: string,
     message: string
-}
+};

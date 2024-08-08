@@ -2,12 +2,12 @@ import { useEffect, useState, memo, ChangeEvent } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-searchable-dropdown-kj';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import { ComponentJSX, ComponentProps } from '../services/type';
+import { ComponentJSX, ComponentProps } from '../../../services/type';
 import { HelperText } from 'react-native-paper';
 import { TextInput } from 'react-native-gesture-handler';
-import { theme } from '../services/theme';
+import { theme } from '../../../services/theme';
 import { FormikErrors } from 'formik';
-import { FormDrug } from '../services/interface';
+import { FormDrug } from '../../../services/interface';
 
 interface AutoDropdownProps {
   label: string,
@@ -159,8 +159,6 @@ const AutoDropdown : ComponentProps<AutoDropdownProps> = ({
   );
 };
 
-export default memo(AutoDropdown);
-
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
@@ -206,3 +204,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
+export default memo(AutoDropdown);

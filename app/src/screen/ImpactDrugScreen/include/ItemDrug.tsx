@@ -10,23 +10,31 @@ import  Animated,
     withTiming 
 } from 'react-native-reanimated';
 import { View } from "react-native";
-import {  memo} from "react";
+import {  memo, useEffect, useState} from "react";
+import { useSelector } from "react-redux";
+import { getCodeScanScreen } from "../../../redux/selection";
+import ChooseEditDelete from "../../../components/ChooseEditDelete";
 
 interface DrugListProps {
-    item: DrugItem,
+    item: {
+        MST: number,
+        avatar: string,
+        tenThuoc: string,   
+    },
     handleEdit: (id : number) => void,
     handleDelete: (id : number, name: string) => void,
 }
 
 
 
-const DrugList : ComponentProps<DrugListProps> = (
+const ItemDrug : ComponentProps<DrugListProps> = (
     {
         item,
         handleEdit,
         handleDelete,
     }) : ComponentJSX => {
 
+    const {MST, avatar, tenThuoc} = item;
     const translationX = useSharedValue(0);
     const panGesture = useAnimatedGestureHandler<PanGestureHandlerGestureEvent>({
         onActive: (event) => {
@@ -114,9 +122,9 @@ const DrugList : ComponentProps<DrugListProps> = (
             <PanGestureHandler onGestureEvent={panGesture}>
                 <Animated.View style = {[styles.item, rStyle]}>
                     <Image 
-                        style = {{width: 50, height:50, borderRadius: 5,}}
-                        source={item.avatar ? 
-                            { uri: item.avatar } 
+                        style = {{width: 50, height:50, objectFit: 'cover', borderRadius: 5,}}
+                        source={avatar ? 
+                            { uri: avatar } 
                             : require('../../../assets/imageDrug.jpg')
                         } 
                     />
@@ -126,10 +134,10 @@ const DrugList : ComponentProps<DrugListProps> = (
                             numberOfLines={1} 
                             ellipsizeMode="tail"
                         >
-                            {item.tenThuoc}
+                            {tenThuoc}
                         </Text>
                         <Text style = {{fontSize: 12, opacity:0.8}}>
-                            {item.MST}
+                            {MST}
                         </Text>
                     </View>
                     <View style = {{position: 'absolute', right: 15}}>
@@ -137,6 +145,7 @@ const DrugList : ComponentProps<DrugListProps> = (
                     </View>
                 </Animated.View>
             </PanGestureHandler>
+            
         </View>
     )
 }
@@ -178,4 +187,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default memo(DrugList);
+export default memo(ItemDrug);

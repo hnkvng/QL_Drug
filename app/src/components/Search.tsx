@@ -1,13 +1,26 @@
 import { ComponentJSX, ComponentProps } from "../services/type"
 import { Searchbar } from "react-native-paper"
+import { memo } from "react";
+import { IconSource } from "react-native-paper/lib/typescript/components/Icon";
 
 interface SearchProps {
     value: string,
+    iconRight?: IconSource 
     setValue: any,
+    handleFocus?: any,
     handleIconSearch?: any,
+    handleIconRight?: any,
 }
 
-const Search : ComponentProps<SearchProps> = ({value, setValue, handleIconSearch}) : ComponentJSX => {
+const Search : ComponentProps<SearchProps> = (
+    {
+        value, 
+        setValue,
+        iconRight, 
+        handleFocus,
+        handleIconSearch, 
+        handleIconRight
+    }) : ComponentJSX => {
     return (
         <Searchbar
             style = {{
@@ -16,13 +29,17 @@ const Search : ComponentProps<SearchProps> = ({value, setValue, handleIconSearch
                 margin: 20,
                 height: 50,
             }}
+            onFocus={handleFocus && (() => handleFocus(true))}
+            onBlur={handleFocus && (() => handleFocus(false))}
+            traileringIcon={iconRight}
+            onTraileringIconPress={handleIconRight}
             cursorColor="black"
             placeholder="Search..."
-            onChangeText={setValue}
             value={value}
+            onChangeText={setValue}
             onIconPress={handleIconSearch}
         />
     )
 }
 
-export default Search;
+export default memo(Search);

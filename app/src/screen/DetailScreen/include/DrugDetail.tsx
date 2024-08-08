@@ -1,62 +1,63 @@
 import { SafeAreaView, View, ScrollView, TouchableOpacity, StyleSheet} from "react-native"
 import { ComponentJSX, ComponentProps } from "../../../services/type"
 import { Text, Title } from "react-native-paper";
-import { useMemo, useState } from "react";
+import { useMemo, useState, memo } from "react";
 import Barcode from '@kichiyaki/react-native-barcode-generator';
 import { theme } from "../../../services/theme";
+import { DATA } from "..";
 
 interface DetailDrugProps {
-    id: string,
-    tenThuoc: string,
-    NSX: string,
-    HSD: string,
-    giaBan: {
-        giaBan: string,
-        donVi: string
-    }[],
-    huongDanSuDung: string,
-    soDangKy: string,
-    hoatChat: string,
-    nongDo: string,
-    baoChe: string,
-    dongGoi: string,
-    tuoiTho:string,
-    congTySx: string,
-    nuocSx: string,
-    diaChiSx: string,
-    congTyDk: string,
-    nuocDk: string,
-    diaChiDk: string,
-    nhomThuoc: string,
+    data: DATA,
 }
 
-const DetailDrug : ComponentProps<DetailDrugProps> = ({
-    id,
-    tenThuoc,
-    NSX,
-    HSD,
-    giaBan,
-    huongDanSuDung,
-    soDangKy,
-    hoatChat,
-    nongDo,
-    baoChe,
-    dongGoi,
-    tuoiTho,
-    congTySx,
-    nuocSx,
-    diaChiSx,
-    congTyDk,
-    nuocDk,
-    diaChiDk,
-    nhomThuoc,
-    }) : ComponentJSX => {
+const DetailDrug : ComponentProps<DetailDrugProps> = ({data}) : ComponentJSX => {
+
+    const {
+        MST,
+        tenThuoc,
+        NSX,
+        HSD,
+        giaBan,
+        huongDanSuDung,
+        soDangKy,
+        hoatChat,
+        nongDo,
+        baoChe,
+        dongGoi,
+        tuoiTho,
+        congTySx,
+        nuocSx,
+        diaChiSx,
+        congTyDk,
+        nuocDk,
+        diaChiDk,
+        nhomThuoc,
+    } = data;
 
     const [selecDonVi, setSelectDonVi] = useState(0);
     const [focus, setFocus] = useState(giaBan.map((_,index) => index === 0 ? true: false));
-
+    const trangThai = useMemo(() => {
+        const dateHSD = new Date(HSD);
+        const now = new Date();
+        if(dateHSD < now) {
+            return 'Thuốc đã hết hạn';
+        }
+        else if(dateHSD.getMonth() === now.getMonth() 
+            && dateHSD.getFullYear() === now.getFullYear()) {
+            if(dateHSD.getDate() <= now.getDate() + 30) {
+                return 'Thuốc gần hết hạn';
+            }
+        } else {
+            return 'Thuốc còn hạn'
+        }
+        
+    },[HSD])
 
     const listDetail = useMemo(() => [
+        {
+            name: 'Trang thái',
+            value: trangThai,
+        },
         {
             name: 'Số đăng ký',
             value: soDangKy,
@@ -121,7 +122,11 @@ const DetailDrug : ComponentProps<DetailDrugProps> = ({
             name: 'Hướng dẫn sử dụng',
             value: huongDanSuDung,
         },
-    ],[])
+    ],[trangThai])
+
+    
+
+
     return (
         <SafeAreaView 
             style = {
@@ -153,9 +158,10 @@ const DetailDrug : ComponentProps<DetailDrugProps> = ({
                     <Barcode
                         style={{marginTop: 10,}}
                         height={80}
-                        value = {id}
+                        value = {MST}
                         format= {"EAN13"}
-                        text= {id}
+                        text= {MST}
+                        onError={(err) => console.log(err)}
                         textStyle= {{color: 'black', fontSize: 12, opacity: 0.6}}
                     />
                     <View 
@@ -263,4 +269,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default DetailDrug;
+export default memo(DetailDrug);

@@ -20,7 +20,7 @@ interface InputAppProps {
     iconR?: IconSource,
     iconL?: IconSource,
     action?: () => void,
-    handleChange? : (e: string | ChangeEvent<any>) => void, 
+    handleChange? : any, 
 }
 
 const InputApp : ComponentProps<InputAppProps>  = ({
@@ -70,7 +70,7 @@ const InputApp : ComponentProps<InputAppProps>  = ({
                 error= {error ? true : false}
                 placeholder= {placeholder}
                 maxLength= {maxLength}
-                onChangeText={handleChange && ((value) => handleChange(value.trim()))}
+                onChangeText={handleChange && ((value) => handleChange(value))}
                 right = {iconRight()}
                 left = {iconL && <TextInput.Icon icon= {iconL} disabled></TextInput.Icon>}
                 multiline = {multiline}
@@ -90,4 +90,4 @@ const InputApp : ComponentProps<InputAppProps>  = ({
     )
 }
 
-export default memo(InputApp,);
+export default memo(InputApp);

@@ -2,7 +2,6 @@ import * as Yup from 'yup';
 // import moment from 'moment';
 
 const regexVN = /[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìĩỉíòóôõùúăđĩũơẰẮẴẲẶĐĨ̀Ĩ́Ĩ̃Ĩ̉Ị̃ỒỐỖỔỘỜỚỠỞỢÙ̀Ù́Ù̃Ù̉Ụ̀ỲỴÝỶỸỊ\ ]+$/
-const regexAmount = /[0-9]+$/
 
 const schema = Yup.object().shape({
     giaBan: Yup.string()
@@ -16,10 +15,10 @@ const schema = Yup.object().shape({
         })
         .required('Không được để trống!'),
     donVi: Yup.string()
+        .trim()
         .matches(regexVN, "Đơn vị không hợp lệ")
         .required('Không được để trống!'),
-    soLuong: Yup.string()
-        .matches(regexAmount, "Số lượng không hợp lệ")
+    quyCach: Yup.string()
         .required('Không được để trống!'),
 });
 

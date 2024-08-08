@@ -1,15 +1,17 @@
-import { StackScreenProps } from "@react-navigation/stack";
-import { addScreenParam, detailScreenParam } from "./type";
+import { StackNavigationProp, StackScreenProps } from "@react-navigation/stack";
+import { addOrReduceScreenParam, detailScreenParam, updateScreenParam } from "./type";
 
 export type RootStackParamList = {
     homeScreen: undefined,
-    addScreen: addScreenParam,
+    addScreen: undefined,
+    updateScreen: updateScreenParam,
     scanScreen: undefined,
     impactScreen: undefined,
+    addOrReduceScreen: addOrReduceScreenParam,
     drugScreen: undefined,
+    storageScreen: undefined,
     detailScreen: detailScreenParam,
     sellScreen: undefined,
 };
 
-export type  addScreenParamProp = StackScreenProps<RootStackParamList,'addScreen'>
-export type  scanScreenParamProp = StackScreenProps<RootStackParamList,'scanScreen'>
+export type PropsNavigation = StackNavigationProp<RootStackParamList>;

@@ -1,52 +1,9 @@
 import {deleteDatabase, enablePromise, openDatabase, SQLiteDatabase, Transaction} from 'react-native-sqlite-storage';
 import {FormDrug, FormPrice } from './interface';
-import {DrugItem, TableName} from './type';
 import { DATABASE, MESSAGE } from './config';
 import uuid from 'uuid-random';
-import { Alert } from 'react-native';
 
-const Drug = {
-  name: 'Drug',
-  column: [
-    'MST',
-    'avatar',
-    'tenThuoc',
-    'soDangKy',
-    'NSX',
-    'HSD'
-  ]
-}
-const DrugDetail = {
-  name: 'Drug_Detail',
-  column: [
-    'MST',
-    'huongDanSuDung',
-    'soDangKy',
-    'hoatChat',
-    'nongDo',
-    'baoChe',
-    'dongGoi',
-    'tuoiTho',
-    'congTySx',
-    'nuocSx',
-    'diaChiSx',
-    'congTyDk',
-    'nuocDk',
-    'diaChiDk',
-    'nhomThuoc',
-  ]
-}
 
-const Price = {
-  name: 'Price',
-  column: [
-    'MST',
-    'giaBan',
-    'donVi',
-    'soLuong',
-    'trongSo'
-  ]
-}
 enablePromise(true);
 // SQLite.DEBUG(true);
 
@@ -59,116 +16,6 @@ export const deleteDB = async () => {
   return deleteDatabase({name: 'Medicine', createFromLocation:'~Medicine.db'});
 }
 
-export const getItems = async (db: SQLiteDatabase, tableName: TableName, condition: string = "", column?: string[], arrange: "ASC" | "DESC" = "ASC"): Promise<object[]> => {
-  try {
-    const item : object[] = [];
-    const results = await db.executeSql(`SELECT ${column ? column.join(','): "*"} FROM ${tableName} ${condition}`);
-    results.forEach(result => {
-      for (let index = 0; index < result.rows.length; index++) {
-        item.push(result.rows.item(index))
-      }
-    });
-    return item;
-  } catch (error : any) {
-    return error.message
-  }
-};
-
-export const getMemberDrug = async (db: SQLiteDatabase) : Promise<{
-  stilldate: number,
-  expired: number,
-  almostExpired:number,
-}> => {
-  try {
-    const stilldate = await db.executeSql(`SELECT HSD FROM ${Drug.name} WHERE HSD > DATE('now', '+30 days')`);
-    const almostExpired = await db.executeSql(`SELECT HSD FROM ${Drug.name} WHERE HSD <= DATE('now', '+30 days') AND HSD >  DATE('now')`);
-    const expired = await db.executeSql(`SELECT HSD FROM ${Drug.name} WHERE  HSD <=  DATE('now')`);
-    
-    return {
-      stilldate: stilldate[0].rows.length,
-      almostExpired: almostExpired[0].rows.length,
-      expired: expired[0].rows.length,
-    }
-  } catch (error : any) {
-    return error.message
-  }
-}
-
-
-export const saveDrugItems = async (db: SQLiteDatabase, FormAdd: FormDrug) => {
-  
-  const {
-    avatar,
-    MST, 
-    tenThuoc, 
-    NSX, 
-    HSD, 
-    giaBan,
-    huongDanSuDung,
-    soDangKy,
-    hoatChat,
-    nongDo,
-    baoChe,
-    dongGoi,
-    tuoiTho,
-    congTySx,
-    nuocSx,
-    diaChiSx,
-    congTyDk,
-    nuocDk,
-    diaChiDk,
-    nhomThuoc,
-  } = FormAdd;
-
-  const priceId = uuid();
-  const drugDetailId = uuid();
-
-
-  const transInsertDrug = 
-  `
-    INSERT INTO ${DATABASE.table.Drug.name} (${DATABASE.table.Drug.column.join(',')})
-    VALUES (${MST}, '${avatar}', '${tenThuoc}', '${NSX}', '${HSD}');
-  `
-  const transInsertPrice = 
-  `
-    INSERT INTO ${DATABASE.table.Price.name} (${DATABASE.table.Price.column.join(',')})
-    VALUES ${giaBan.map((value, index) => 
-      `(${priceId}, '${value.giaBan}', '${value.donVi}' ,${value.soLuong}, ${index+1}, ${MST})`).join(',')};
-  `
-  const transInsertDrugDetail = 
-  `
-    INSERT INTO ${DrugDetail.name} (${DrugDetail.column.join(',')})
-    VALUES (
-      ${drugDetailId}
-      ${huongDanSuDung},
-      ${soDangKy},
-      ${hoatChat},
-      ${nongDo},
-      ${baoChe},
-      ${dongGoi},
-      ${tuoiTho},
-      ${congTySx},
-      ${nuocSx},
-      ${diaChiSx},
-      ${congTyDk},
-      ${nuocDk},
-      ${diaChiDk},
-      ${nhomThuoc},
-      ${MST}
-    );
-  `
-  try {
-    await db.executeSql(transInsertDrug);
-    await db.executeSql(transInsertPrice);
-    await db.executeSql(transInsertDrugDetail);
-
-    return {message: "Thêm thuốc thành công"}
-  } catch (error) {
-    throw error
-  }
-  
-};
-
 export class Database { 
  
 
@@ -178,9 +25,22 @@ export class Database {
     this.db = openDatabase(
       {
         name: DATABASE.name, 
-        createFromLocation: DATABASE.location
+        createFromLocation: DATABASE.location,
       }
     )
+  }
+  async onPragma() {
+    (await this.db).executeSql("pragma foreign_keys=on");
+  }
+
+  testSameId(MST : number) {
+    const querySameId = `SELECT MST FROM ${DATABASE.table.Drug.name} WHERE MST = ${MST};`
+    return this.createTransaction(querySameId);
+  }
+
+  testSameSDK(soDangKy: string) {
+    const querySameSDK = `SELECT soDangKy FROM ${DATABASE.table.DrugDetail.name} WHERE soDangKy = '${soDangKy}';`
+    return this.createTransaction(querySameSDK);
   }
 
   createTransaction(query : string, queryAfter?: string) {
@@ -245,84 +105,81 @@ export class Database {
       nhomThuoc,
     } = FormAdd;
 
-    const querySameId = `SELECT id FROM ${DATABASE.table.Drug.name} WHERE id = ${MST};`
-    const querySameSDK = `SELECT soDangKy FROM ${DATABASE.table.DrugDetail.name} WHERE soDangKy = '${soDangKy}';`
-
-    const sameId : any = await this.createTransaction(querySameId);
-    const sameSDK : any = await this.createTransaction(querySameSDK);
-
-    if(sameId.rows.length) {
-      throw MESSAGE.addInfoDrug.warning.sameId;
+    try {
+      const sameId : any = await this.testSameId(parseInt(MST));
+      const sameSDK : any = await this.testSameSDK(soDangKy);
+      if(sameId.rows.length) {
+        throw MESSAGE.addInfoDrug.warning.sameId;
+      }
+      else if(sameSDK.rows.length) {
+        throw MESSAGE.addInfoDrug.warning.sameDrug;
+      }
+    } catch (error){
+      throw error
     }
-    else if(sameSDK.rows.length) {
-      throw MESSAGE.addInfoDrug.warning.sameDrug;
-    }
+    
 
-    const drugDetailId = uuid();
-    const storageId = uuid();
-    const donViBasic = giaBan[giaBan.length - 1].donVi;
-    const soLuongStorage = giaBan.reduce((sum, item) => {
-      sum *= parseInt(item.soLuong);
-      return sum;
-    }, 1)
+    try {
+      const drugDetailId = uuid();
+      const storageId = uuid();
+      const donViBasic = giaBan[giaBan.length - 1].donVi;
 
-    const transInsertDrug = 
-    `
-      INSERT INTO ${DATABASE.table.Drug.name} (${DATABASE.table.Drug.column.join(',')})
-      VALUES (${MST}, '${avatar}', '${tenThuoc}', '${NSX}', '${HSD}');
-    `
-    const transInsertPrice = 
-    `
-      INSERT INTO ${DATABASE.table.Price.name} (${DATABASE.table.Price.column.join(',')})
-      VALUES ${giaBan.map((value, index) => {
-        let priceId = uuid();
-        return `('${priceId}', '${value.giaBan}', '${value.donVi}' ,${value.soLuong}, ${index+1}, ${MST})`
-      }).join(',\n')};
-    `
+      const transInsertDrug = 
+      `
+        INSERT INTO ${DATABASE.table.Drug.name} (${DATABASE.table.Drug.column.join(',')})
+        VALUES (${MST}, '${avatar}', '${tenThuoc}', '${NSX}', '${HSD}');
+      `
+      const transInsertPrice = 
+      `
+        INSERT INTO ${DATABASE.table.Price.name} (${DATABASE.table.Price.column.join(',')})
+        VALUES ${giaBan.map((value) => {
+          let priceId = uuid();
+          return `('${priceId}', '${value.giaBan}', '${value.donVi}' ,${value.quyCach}, ${MST})`
+        }).join(',\n')};
+      `
 
-    const transInsertDrugDetail = 
-    `
-      INSERT INTO ${DATABASE.table.DrugDetail.name} (${DATABASE.table.DrugDetail.column.join(',')})
-      VALUES (
-        '${drugDetailId}',
-        '${soDangKy}',
-        '${huongDanSuDung}',
-        '${hoatChat}',
-        '${nongDo}',
-        '${baoChe}',
-        '${dongGoi}',
-        '${tuoiTho}',
-        '${congTySx}',
-        '${nuocSx}',
-        '${diaChiSx}',
-        '${congTyDk}',
-        '${nuocDk}',
-        '${diaChiDk}',
-        '${nhomThuoc}',
-        ${MST}
-      );
-    `
+      const transInsertDrugDetail = 
+      `
+        INSERT INTO ${DATABASE.table.DrugDetail.name} (${DATABASE.table.DrugDetail.column.join(',')})
+        VALUES (
+          '${drugDetailId}',
+          '${soDangKy}',
+          '${huongDanSuDung}',
+          '${hoatChat}',
+          '${nongDo}',
+          '${baoChe}',
+          '${dongGoi}',
+          '${tuoiTho}',
+          '${congTySx}',
+          '${nuocSx}',
+          '${diaChiSx}',
+          '${congTyDk}',
+          '${nuocDk}',
+          '${diaChiDk}',
+          '${nhomThuoc}',
+          ${MST}
+        );
+      `
 
-    const transStorage = 
-    `
-      INSERT INTO ${DATABASE.table.Storage.name} (${DATABASE.table.Storage.column.join(',')})
-      VALUES (
-        '${storageId}',
-        '${donViBasic}',
-        ${soLuongStorage},
-        ${MST}
-      );
-    `
-    const query = 
-    `
+      const transStorage = 
+      `
+        INSERT INTO ${DATABASE.table.Storage.name} (${DATABASE.table.Storage.column.join(',')})
+        VALUES (
+          '${storageId}',
+          '${donViBasic}',
+          ${0},
+          ${MST}
+        );
+      `
+      const query = 
+      `
         ${transInsertPrice}
         ${transInsertDrugDetail}
         ${transStorage}
-    `
+      `
 
-    const nameTrigger = 'addInfoDrug';
+      const nameTrigger = 'addInfoDrug';
 
-    try {
       await this.createTrigger(nameTrigger, 'AFTER', 'INSERT', DATABASE.table.Drug.name, query);
       await this.createTransaction(transInsertDrug,`DROP TRIGGER ${nameTrigger}`);
       return MESSAGE.addInfoDrug.susscess;
@@ -333,7 +190,11 @@ export class Database {
     
   }
 
-  async updateInfoDrug(id: number, soDangKyInit: string, giaBanInit: FormPrice[], FormAdd: FormDrug) {
+  async updateInfoDrug(
+    MSTInit: number, 
+    soDangKyInit: string,
+    FormAdd: FormDrug
+  ) {
     const {
       avatar,
       MST, 
@@ -357,124 +218,75 @@ export class Database {
       nhomThuoc,
     } = FormAdd;
     
-    if(id !== parseInt(MST)) {
-      const querySameId = `SELECT id FROM ${DATABASE.table.Drug.name} WHERE id = ${MST};`
-      const sameId : any = await this.createTransaction(querySameId);
-      if(sameId.rows.length) {
-        throw MESSAGE.updateInfoDrug.warning.sameId;
-      }
-    } 
-    if(soDangKy !== soDangKyInit) {
-      const querySameSDK = `SELECT soDangKy FROM ${DATABASE.table.DrugDetail.name} WHERE soDangKy = '${soDangKy}';`
-      const sameSDK : any = await this.createTransaction(querySameSDK);
-      if(sameSDK.rows.length) {
-        throw MESSAGE.updateInfoDrug.warning.sameDrug;
-      }
-    }
-
-    const donViBasic = giaBan[giaBan.length - 1].donVi;
-    const soLuongStorage = giaBan.reduce((sum, item) => {
-      sum *= parseInt(item.soLuong);
-      return sum;
-    }, 1)
-    
-    const transChangeDrug = 
-    `
-      UPDATE ${DATABASE.table.Drug.name}
-      SET id = ${MST},
-          avatar = '${avatar}',
-          tenThuoc = '${tenThuoc}',
-          NSX = '${NSX}',
-          HSD = '${HSD}'
-      WHERE id = ${id};
-    `
-
-    let transChangePrice = '';
-
-    for(let index = 0; index < giaBanInit.length; index++) {
-      transChangePrice += 
-      `
-        UPDATE ${DATABASE.table.Price.name}
-        SET giaBan = '${giaBan[index].giaBan}',
-            donVi = '${giaBan[index].donVi}',
-            soLuong = ${giaBan[index].soLuong},
-            Drug_Id = ${MST}
-        WHERE Drug_Id = ${id} AND trongSo = ${index + 1};
-      `
-    }
-
-    if(giaBan.length < giaBanInit.length) {
-      const start = giaBanInit.length;
-      const end = giaBan.length;
-      for(let index = start; index > end; index--) {
-        transChangePrice += 
-        `
-          DELETE FROM ${DATABASE.table.Price.name}
-          WHERE Drug_Id = ${id} AND trongSo = ${index};
-        `
-      }
-    } 
-    if (giaBan.length > giaBanInit.length) {
-      const start = giaBanInit.length;
-      const end = giaBan.length;
-      for(let index = start; index < end; index++) {
-        let priceId = uuid();
-        transChangePrice += 
-        `
-          INSERT INTO ${DATABASE.table.Price.name} (${DATABASE.table.Price.column.join(',')})
-          VALUES (
-            '${priceId}', 
-            '${giaBan[index].giaBan}', 
-            '${giaBan[index].donVi}', 
-            ${giaBan[index].soLuong}, 
-            ${index + 1}, 
-            ${MST}
-          );
-        `
-      }
-    }
-    
-    const transChangeDrugDetail = 
-    `
-      UPDATE ${DATABASE.table.DrugDetail.name}
-      SET huongDanSuDung = '${huongDanSuDung}',
-          soDangKy = '${soDangKy}',
-          hoatChat = '${hoatChat}',
-          nongDo = '${nongDo}',
-          baoChe = '${baoChe}',
-          dongGoi = '${dongGoi}',
-          tuoiTho = '${tuoiTho}',
-          congTySx = '${congTySx}',
-          nuocSx = '${nuocSx}',
-          diaChiSx = '${diaChiSx}',
-          congTyDk = '${congTyDk}',
-          nuocDk = '${nuocDk}',
-          diaChiDk = '${diaChiDk}',
-          nhomThuoc = '${nhomThuoc}',
-          Drug_Id = ${MST}
-      WHERE Drug_Id = ${id};
-    `
-
-    const transStorage = 
-    `
-      UPDATE ${DATABASE.table.Storage.name}
-      SET donViCoBan = '${donViBasic}',
-          soLuong = ${soLuongStorage},
-          Drug_Id = ${MST}
-      WHERE Drug_Id = ${id};
-    `
-
-    const query = 
-    `
-      ${transChangePrice}
-      ${transChangeDrugDetail}
-      ${transStorage}
-    `
-    
-    const nameTrigger = 'changeInfoDrug';
-
-    
     try {
+      //check same MST
+      if(MSTInit !== parseInt(MST)) {  
+          const sameId : any = await this.testSameId(parseInt(MST));
+          if(sameId.rows.length) {
+            throw MESSAGE.updateInfoDrug.warning.sameId;
+          }
+      } 
+    
+      //check same drug
+      if(soDangKy !== soDangKyInit) {
+        const sameSDK : any = await this.testSameSDK(soDangKy);
+        if(sameSDK.rows.length) {
+          throw MESSAGE.updateInfoDrug.warning.sameDrug;
+        }
+      }
+    } catch (error){
+      throw error
+    }
+
+    try {
+      const transChangeDrug = 
+      `
+        UPDATE ${DATABASE.table.Drug.name}
+        SET MST = ${MST},
+            avatar = '${avatar}',
+            tenThuoc = '${tenThuoc}',
+            NSX = '${NSX}',
+            HSD = '${HSD}'
+        WHERE MST = ${MSTInit};
+      `
+
+      const transChangeDrugDetail = 
+      `
+        UPDATE ${DATABASE.table.DrugDetail.name}
+        SET huongDanSuDung = '${huongDanSuDung}',
+            soDangKy = '${soDangKy}',
+            hoatChat = '${hoatChat}',
+            nongDo = '${nongDo}',
+            baoChe = '${baoChe}',
+            dongGoi = '${dongGoi}',
+            tuoiTho = '${tuoiTho}',
+            congTySx = '${congTySx}',
+            nuocSx = '${nuocSx}',
+            diaChiSx = '${diaChiSx}',
+            congTyDk = '${congTyDk}',
+            nuocDk = '${nuocDk}',
+            diaChiDk = '${diaChiDk}',
+            nhomThuoc = '${nhomThuoc}'
+        WHERE Drug_Id = ${MSTInit};
+      `
+
+      const transPrice = giaBan.map((item) => (
+        `
+          UPDATE ${DATABASE.table.Price.name}
+          SET giaBan = '${item.giaBan}'
+          WHERE Drug_Id = ${MSTInit} AND donVi = '${item.donVi}';
+        `
+      )).join('\n');
+      
+
+      const query = 
+      `
+        ${transChangeDrugDetail}
+        ${transPrice}
+      `
+      
+      const nameTrigger = 'changeInfoDrug';
+
       await this.createTrigger(nameTrigger, 'AFTER', 'UPDATE', DATABASE.table.Drug.name, query);
       await this.createTransaction(transChangeDrug,`DROP TRIGGER ${nameTrigger}`)
       return MESSAGE.updateInfoDrug.susscess;
@@ -484,24 +296,149 @@ export class Database {
     }
   }
 
-  getItemDrug(selectColumn: string[], condition?: string) {
-    const query = `SELECT ${selectColumn.join(',')} FROM ${DATABASE.table.Drug.name} ${condition}`
-    return this.createTransaction(query);
+  async deleteItemDrug(MST: number) {
+    try {
+      const searchDrug : any = await this.getItem(['MST'], DATABASE.table.Drug.name, `WHERE MST = ${MST}`);
+
+      if(!searchDrug.rows.length) {
+        throw MESSAGE.deleteDrug.warning.notId;
+      }
+    } catch (error){
+      throw error
+    }
+
+    try {
+      const tranDeleteDrug = 
+      `
+        DELETE FROM ${DATABASE.table.Drug.name} WHERE MST = ${MST};
+      `
+
+      await this.createTransaction(tranDeleteDrug);
+      return MESSAGE.deleteDrug.susscess;
+    }
+    catch (error : any) {
+      throw MESSAGE.error;
+    }
   }
 
-  getItemDrugDetail(selectColumn: string[], condition?: string) {
-    const query = `SELECT ${selectColumn} FROM ${DATABASE.table.DrugDetail.name} ${condition}`
-    return this.createTransaction(query);
+  async sellDrug(
+    listCart: {
+      id: number,
+      avatar: string,
+      tenThuoc: string, 
+      giaBan: string,
+      soLuong: number,
+      donVi: string,
+      heSo: number,
+    }[],
+    tongTien: number,
+    ) {
+
+    for(let index = 0; index < listCart.length; index++) {
+      const {id, tenThuoc, soLuong, heSo} = listCart[index]
+
+      const querySoLuongTonKho = 
+      `
+        SELECT donViTinh, soLuongTonKho FROM ${DATABASE.table.Storage.name}
+        WHERE Drug_Id = ${id}
+        ;
+      `
+      try {
+        const tonKho : any = await this.createTransaction(querySoLuongTonKho);
+        const soLuongTrongKho =  tonKho.rows.item(0).soLuongTonKho;
+        const donVi = tonKho.rows.item(0).donViTinh;
+        const math = soLuongTrongKho - (soLuong * heSo);
+
+       
+        if(math < 0) {
+          throw MESSAGE.sellDrug.warning.qualityIvalid(tenThuoc, soLuongTrongKho, donVi);
+        }
+
+        const transStorage = 
+        `
+          UPDATE ${DATABASE.table.Storage.name}
+          SET soLuongTonKho = ${math}
+          WHERE Drug_Id = ${id};
+        `
+        
+        await this.createTransaction(transStorage);
+      } 
+      catch (error) {
+        throw error;
+      }
+    }
+    
+    const sellId = uuid();
+
+    const tranSell = 
+    `
+      INSERT INTO ${DATABASE.table.Sell.name} (${DATABASE.table.Sell.column.join(',')})
+      VALUES ('${sellId}', ${tongTien}, '${new Date()}');
+    `
+    
+    try {
+      await this.createTransaction(tranSell);
+      return MESSAGE.sellDrug.susscess;
+    } catch {
+      throw MESSAGE.error;
+    }
   }
 
-  getIemPrice(selectColumn: string[], condition?: string) {
-    const query = `SELECT ${selectColumn.join(',')} FROM ${DATABASE.table.Price.name} ${condition}`
+  async addOrReduceDrug(
+    soLuong: number,  
+    soLuongTonKho: number,
+    addOrReduce: "Thêm" | "Bớt", 
+    MST: number
+  ) {
+
+    let math = 0;
+
+    try {
+      switch (addOrReduce) {
+        case "Thêm":
+          math = soLuongTonKho + soLuong;
+          break;
+        case "Bớt":
+          math = soLuongTonKho - soLuong;
+          break;
+        default: 
+          throw MESSAGE.error;
+      }
+
+      if(math < 0) {
+        throw MESSAGE.addOrReduceDrug.warning.qualityIvalid;
+      } else if (math > 1000000) {
+        throw MESSAGE.addOrReduceDrug.warning.maxStorage;
+      }
+      
+    } catch (error){
+      throw error
+    }
+    
+    try {
+      const transAddOrReduce = 
+      `
+        UPDATE ${DATABASE.table.Storage.name}
+        SET soLuongTonKho = ${math}
+        WHERE Drug_Id = ${MST};
+      `
+      await this.createTransaction(transAddOrReduce);
+    } catch (error) {
+      throw MESSAGE.error;
+    }
+    return MESSAGE.addOrReduceDrug.susscess(addOrReduce);
+    
+    
+  }
+
+  getItem(selectColumn: string[], table: string,  condition?: string) {
+    const query = `SELECT ${selectColumn.join(',')} FROM ${table} ${condition ? condition: ''}`
     return this.createTransaction(query);
   }
 
   getDetail(condition: string) {
     const listColumn = [
-      'D.id',
+      'MST',
       'avatar',
       'tenThuoc',
       'NSX',
@@ -520,9 +457,12 @@ export class Database {
       'nuocDk',
       'diaChiDk',
       'nhomThuoc',
+      'soLuongTonKho',
+      'donViTinh'
     ]
     const nameDrug = DATABASE.table.Drug.name;
     const nameDrugDetail = DATABASE.table.DrugDetail.name;
+    const nameDrugStorage = DATABASE.table.Storage.name;
 
     const query = 
     `
@@ -530,15 +470,12 @@ export class Database {
       ${listColumn.join(',')}
       FROM ${nameDrug} as D
       JOIN ${nameDrugDetail} as DT
-      ON D.id = DT.Drug_Id
+      ON MST = DT.Drug_Id
+      JOIN ${nameDrugStorage} as S
+      ON MST = S.Drug_Id
       ${condition}
       ;
     `
-    return this.createTransaction(query);
-  }
-
-  getStorage(selectColumn: string[], condition?: string) {
-    const query = `SELECT ${selectColumn.join(',')} FROM ${DATABASE.table.Storage.name} ${condition}`
     return this.createTransaction(query);
   }
 
@@ -550,36 +487,7 @@ export class Database {
     return this.createTransaction(query);
   }
 
-  async deleteItemDrug(id: number) {
-
-    const searchDrug : any = await this.getItemDrug(['id'], `WHERE id = ${id}`);
-
-    if(!searchDrug.rows.length) {
-      throw MESSAGE.deleteDrug.warning.notId;
-    }
-
-    const nameTrigger = 'deleteItemDrug'
-    const tranDeleteDrug = 
-    `
-      DELETE FROM ${DATABASE.table.Drug.name} WHERE id = ${id};
-    `
-    const query = 
-    `
-      DELETE FROM ${DATABASE.table.Price.name} WHERE Drug_Id = ${id};
-      DELETE FROM ${DATABASE.table.DrugDetail.name} WHERE Drug_Id = ${id};
-      DELETE FROM ${DATABASE.table.Storage.name} WHERE Drug_Id = ${id};
-    `
-
-    try {
-      await this.createTrigger(nameTrigger, 'AFTER', 'DELETE', DATABASE.table.Drug.name, query);
-      await this.createTransaction(tranDeleteDrug,`DROP TRIGGER ${nameTrigger}`)
-      return MESSAGE.deleteDrug.susscess;
-    }
-    catch (error : any) {
-      Alert.alert(error);
-      throw MESSAGE.error;
-    }
-  }
+  
 }
 
 

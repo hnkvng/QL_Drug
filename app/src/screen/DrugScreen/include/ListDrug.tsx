@@ -1,36 +1,40 @@
 import { SafeAreaView, View } from "react-native"
-import { useCallback, useEffect, useMemo, useState} from "react"
+import { useCallback, useMemo, useState, memo} from "react"
 import { Database } from "../../../services/db"
 import { useFocusEffect } from "@react-navigation/native";
 import ItemDrug from "./ItemDrug";
 import { FlatList } from "react-native-gesture-handler";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { querySearchDrug } from "../../../redux/selection";
 import { Text } from "react-native-paper";
 import { ComponentJSX } from "../../../services/type";
+import notifiSlice from "../../../componentsSpecial/Notification/slice";
+
+export interface DATA {
+    MST: number,
+    avatar: string,
+    tenThuoc: string,
+    soDangKy: string,
+    NSX: string,
+    HSD: string,
+}
 
 const ListDrug = () : ComponentJSX => {
 
+    const dispatch = useDispatch();
     const db = useMemo(() => new Database(),[]);
-
+    const [data, setData] = useState<DATA[]>([]);
     const condition = useSelector(querySearchDrug);
 
-    const [listDrug, setListDrug] = useState<{
-        id: number,
-        avatar: string,
-        tenThuoc: string,
-        soDangKy: string,
-        NSX: string,
-        HSD: string,
-    }[]>([]);
-
+    const handleError = notifiSlice.actions.handleError;
+   
     useFocusEffect(
         useCallback(() => {
             db.getDetail(condition).then((data : any) => {
-                const item = [];
+                const item : DATA[] = [];
                 for(let index = 0; index < data.rows.length; index++) {
                     item.push({
-                        id: data.rows.item(index).id,
+                        MST: data.rows.item(index).MST,
                         avatar: data.rows.item(index).avatar,
                         tenThuoc: data.rows.item(index).tenThuoc,
                         soDangKy: data.rows.item(index).soDangKy,
@@ -38,17 +42,20 @@ const ListDrug = () : ComponentJSX => {
                         HSD: data.rows.item(index).HSD,
                     })
                 }
-                setListDrug(item);
+                setData(item);
+            })
+            .catch(() => {
+                dispatch(handleError())
             })
         },[condition])
     )
     return (
         <SafeAreaView style = {{flex: 1, backgroundColor: 'white'}}>
             {
-                listDrug.length > 0 ? <FlatList
-                    data={listDrug}
+                data.length > 0 ? <FlatList
+                    data={data}
                     renderItem={({item, index}) => (
-                        <ItemDrug key={index} {...item}></ItemDrug>
+                        <ItemDrug key={index} item={item}/>
                     )}
                 >
                 </FlatList>:
@@ -60,4 +67,4 @@ const ListDrug = () : ComponentJSX => {
     )
 }
 
-export default ListDrug;
+export default memo(ListDrug);
